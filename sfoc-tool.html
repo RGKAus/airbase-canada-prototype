@@ -1,120 +1,88 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI-assisted SFOC Drafting Tool — DroneSense Airbase</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+<h2 class="sr-only">AI-assisted SFOC drafting tool for Canadian drone operators — generates a Transport Canada Special Flight Operations Certificate application based on guided inputs</h2>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{min-height:100%;background:#0f1117;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:13px;color:#e2e4e9}
-.wrap{max-width:860px;margin:0 auto;padding:24px 20px}
-.tool-header{background:#161b27;border:0.5px solid #2a3045;border-radius:10px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-.tool-title{font-size:15px;font-weight:600;color:#e2e4e9;display:flex;align-items:center;gap:8px}
-.tool-sub{font-size:12px;color:#6b7280;margin-top:3px}
-.tc-badge{background:#1a2d4a;color:#93c5fd;font-size:11px;padding:4px 10px;border-radius:6px;font-weight:500;border:0.5px solid #1e3a5f;white-space:nowrap}
-.scenario-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-.sc-btn{background:#161b27;border:0.5px solid #2a3045;border-radius:8px;padding:12px 14px;cursor:pointer;text-align:left;transition:border-color .15s;width:100%}
-.sc-btn:hover{border-color:#4b6a9b}
-.sc-btn.active{border:1.5px solid #3b82f6;background:#0c1e35}
-.sc-label{font-size:12px;font-weight:600;color:#e2e4e9;margin-bottom:4px}
-.sc-sub{font-size:11px;color:#6b7280;line-height:1.5}
-.sc-btn.active .sc-label{color:#93c5fd}
-.progress-bar{height:4px;background:#1f2937;border-radius:2px;margin-bottom:16px;overflow:hidden}
-.progress-fill{height:100%;background:#3b82f6;border-radius:2px;transition:width .3s}
-.steps{display:flex;align-items:center;gap:4px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px}
-.step-item{display:flex;align-items:center;gap:5px;flex-shrink:0}
-.step-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;cursor:pointer;flex-shrink:0}
-.s-done{background:#064e3b;color:#34d399}
-.s-active{background:#1e3a5f;color:#93c5fd}
-.s-todo{background:#1f2937;color:#4b5563}
-.step-label{font-size:11px;color:#6b7280;white-space:nowrap}
-.step-label.active{color:#e2e4e9;font-weight:500}
-.step-line{width:20px;height:0.5px;background:#2a3045;flex-shrink:0}
-.panel{background:#161b27;border:0.5px solid #2a3045;border-radius:10px;padding:18px 20px;margin-bottom:16px;width:100%}
-.panel-title{font-size:13px;font-weight:600;color:#e2e4e9;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.panel-title i{font-size:16px;color:#4b5563}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.field{display:flex;flex-direction:column;gap:5px;min-width:0}
-.field label{font-size:11px;color:#6b7280;font-weight:500}
+.wrap{padding:1rem 0;font-family:var(--font-sans);max-width:100%;overflow-x:hidden}
+.tool-header{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.tool-title{font-size:15px;font-weight:500;color:var(--color-text-primary);display:flex;align-items:center;gap:8px}
+.tool-sub{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.tc-badge{background:var(--color-background-info);color:var(--color-text-info);font-size:11px;padding:3px 9px;border-radius:var(--border-radius-md);font-weight:500;white-space:nowrap}
+.scenario-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.sc-btn{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px;cursor:pointer;text-align:left;transition:border-color .15s;width:100%}
+.sc-btn:hover{border-color:var(--color-border-secondary)}
+.sc-btn.active{border:1.5px solid var(--color-border-info);background:var(--color-background-info)}
+.sc-label{font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.sc-sub{font-size:11px;color:var(--color-text-secondary);line-height:1.4}
+.sc-btn.active .sc-label{color:var(--color-text-info)}
+.steps{display:flex;align-items:center;gap:4px;margin-bottom:1rem;overflow-x:auto;padding-bottom:4px}
+.step-item{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.step-dot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;cursor:pointer}
+.s-done{background:var(--color-background-success);color:var(--color-text-success)}
+.s-active{background:var(--color-background-info);color:var(--color-text-info)}
+.s-todo{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.step-label{font-size:11px;color:var(--color-text-secondary);white-space:nowrap}
+.step-label.active{color:var(--color-text-primary);font-weight:500}
+.step-line{width:16px;height:0.5px;background:var(--color-border-tertiary);flex-shrink:0}
+.panel{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:1rem;width:100%}
+.panel-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.panel-title i{font-size:15px;color:var(--color-text-secondary)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-size:11px;color:var(--color-text-secondary)}
 .field.full{grid-column:1/-1}
-input[type=text],input[type=email],input[type=date],select,textarea{width:100%;background:#0f1117;border:0.5px solid #2a3045;border-radius:6px;padding:8px 10px;font-size:12px;color:#e2e4e9;font-family:inherit;outline:none;transition:border-color .15s}
-input:focus,select:focus,textarea:focus{border-color:#3b82f6}
-input[readonly]{background:#1f2937;color:#9ca3af;cursor:default}
-select option{background:#1f2937;color:#e2e4e9}
-textarea{resize:vertical;min-height:70px;line-height:1.5}
-.info-box{background:#0c1e35;border:0.5px solid #1e3a5f;border-radius:7px;padding:11px 14px;margin-bottom:14px;font-size:12px;color:#93c5fd;display:flex;gap:9px;align-items:flex-start;width:100%}
-.warn-box{background:#1c1008;border:0.5px solid #92400e;border-radius:7px;padding:11px 14px;margin-bottom:14px;font-size:12px;color:#d97706;display:flex;gap:9px;align-items:flex-start;width:100%}
-.info-box i,.warn-box i{flex-shrink:0;font-size:16px;margin-top:1px}
-.info-box div,.warn-box div{flex:1;min-width:0;line-height:1.6}
-.mit-list{width:100%;border:0.5px solid #2a3045;border-radius:8px;overflow:hidden}
-.mit-check{display:grid;grid-template-columns:18px 1fr;gap:12px;align-items:start;padding:12px 14px;border-bottom:0.5px solid #1f2937;width:100%}
+select,input,textarea{width:100%;font-size:12px;font-family:var(--font-sans)}
+textarea{resize:vertical;min-height:60px}
+.info-box{background:var(--color-background-info);border:0.5px solid var(--color-border-info);border-radius:var(--border-radius-md);padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--color-text-info);display:flex;gap:8px;align-items:flex-start;width:100%}
+.warn-box{background:var(--color-background-warning);border:0.5px solid var(--color-border-warning);border-radius:var(--border-radius-md);padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--color-text-warning);display:flex;gap:8px;align-items:flex-start;width:100%}
+.warn-box i,.info-box i{flex-shrink:0;font-size:15px;margin-top:1px}
+.warn-box div,.info-box div{flex:1;min-width:0;line-height:1.5}
+.mit-list{width:100%;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);overflow:hidden}
+.mit-check{display:grid;grid-template-columns:20px 1fr;gap:10px;align-items:start;padding:10px 12px;border-bottom:0.5px solid var(--color-border-tertiary);width:100%}
 .mit-check:last-child{border-bottom:none}
-.mit-check:hover{background:#1a1f2e}
-.mit-check input[type=checkbox]{margin-top:3px;width:14px;height:14px;accent-color:#3b82f6;cursor:pointer;flex-shrink:0}
+.mit-check input[type=checkbox]{margin-top:3px;width:14px;height:14px;flex-shrink:0}
 .mit-text{min-width:0;overflow:hidden}
-.mit-name{font-size:12px;color:#e2e4e9;font-weight:500;line-height:1.4;word-wrap:break-word}
-.mit-sub{font-size:11px;color:#6b7280;line-height:1.5;word-wrap:break-word;margin-top:2px}
-.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:4px;flex-wrap:wrap;gap:8px}
-.btn-back{background:#1f2937;color:#9ca3af;border:0.5px solid #2a3045;border-radius:7px;padding:8px 16px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit}
-.btn-back:hover{background:#374151;color:#e2e4e9}
-.btn-next{background:#1e3a5f;color:#93c5fd;border:0.5px solid #2a5080;border-radius:7px;padding:8px 18px;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit}
-.btn-next:hover{background:#1e4a7f}
-.btn-generate{background:#064e3b;color:#34d399;border:0.5px solid #065f46;border-radius:7px;padding:9px 22px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit}
-.btn-generate:hover{background:#065f46}
-.btn-calc{background:#1f2937;color:#9ca3af;border:0.5px solid #2a3045;border-radius:6px;padding:7px 14px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit;margin-top:10px}
-.btn-calc:hover{background:#374151;color:#e2e4e9}
-.output-actions{display:flex;gap:8px;margin-bottom:14px;align-items:center;flex-wrap:wrap}
-.btn-action{background:#1f2937;color:#9ca3af;border:0.5px solid #2a3045;border-radius:7px;padding:7px 14px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit}
-.btn-action:hover{background:#374151;color:#e2e4e9}
-.btn-print{background:#1e3a5f;color:#93c5fd;border:0.5px solid #2a5080;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit}
-.btn-print:hover{background:#1e4a7f}
-.ai-label{font-size:11px;color:#4b5563;display:flex;align-items:center;gap:4px;margin-left:auto}
-.sfoc-output{background:#ffffff;border:0.5px solid #2a3045;border-radius:10px;padding:28px 32px;font-size:12px;line-height:1.7;color:#1f2937;width:100%}
-.sfoc-h1{font-size:16px;font-weight:600;text-align:center;margin-bottom:4px;color:#1f2937}
-.sfoc-h2{font-size:13px;font-weight:600;margin:18px 0 7px;color:#1f2937;border-bottom:1px solid #e5e7eb;padding-bottom:4px}
-.sfoc-table{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:11px;table-layout:fixed}
-.sfoc-table td,.sfoc-table th{border:0.5px solid #d1d5db;padding:6px 10px;vertical-align:top;word-wrap:break-word}
-.sfoc-table th{background:#f9fafb;font-weight:600;color:#6b7280;font-size:10px;text-transform:uppercase;letter-spacing:.04em}
-.sfoc-p{margin-bottom:8px;color:#374151;line-height:1.6}
-.sfoc-li{margin-left:18px;margin-bottom:4px;color:#374151}
-.sfoc-divider{border:none;border-top:1px solid #e5e7eb;margin:14px 0}
-.sfoc-warn{background:#fffbeb;border:0.5px solid #fcd34d;border-radius:6px;padding:10px 14px;margin:10px 0;font-size:12px;color:#92400e;display:flex;gap:8px;align-items:flex-start}
-.sfoc-info{background:#eff6ff;border:0.5px solid #bfdbfe;border-radius:6px;padding:10px 14px;margin:10px 0;font-size:12px;color:#1e40af;display:flex;gap:8px;align-items:flex-start}
-.sfoc-warn i,.sfoc-info i{flex-shrink:0;font-size:15px;margin-top:1px}
-.sfoc-warn div,.sfoc-info div{flex:1;min-width:0;line-height:1.6}
-.draft-banner{background:#fef3c7;border:1px solid #fcd34d;border-radius:7px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#92400e;display:flex;align-items:center;gap:8px;font-weight:500}
-@media print{
-  body{background:#fff;color:#000}
-  .tool-header,.scenario-row,.progress-bar,.steps,.output-actions,.draft-banner{display:none!important}
-  .sfoc-output{border:none;padding:0;color:#000}
-  .sfoc-table td,.sfoc-table th{border:1px solid #999}
-}
-::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:#2a3045;border-radius:3px}
+.mit-name{font-size:12px;color:var(--color-text-primary);font-weight:500;line-height:1.4;word-wrap:break-word}
+.mit-sub{font-size:11px;color:var(--color-text-secondary);line-height:1.5;word-wrap:break-word;margin-top:2px}
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+.btn-nav-next{background:var(--color-background-info);color:var(--color-text-info);border:0.5px solid var(--color-border-info);border-radius:var(--border-radius-md);padding:7px 16px;font-size:12px;font-weight:500;cursor:pointer}
+.btn-nav-back{background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:7px 16px;font-size:12px;cursor:pointer}
+.btn-generate{background:var(--color-background-success);color:var(--color-text-success);border:0.5px solid var(--color-border-success);border-radius:var(--border-radius-md);padding:8px 20px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px}
+.progress-bar{height:4px;background:var(--color-background-secondary);border-radius:2px;margin-bottom:1rem;overflow:hidden}
+.progress-fill{height:100%;background:var(--color-background-info);border-radius:2px;transition:width .3s}
+.sfoc-output{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.5rem;font-size:12px;line-height:1.7;color:var(--color-text-primary);width:100%}
+.sfoc-h1{font-size:15px;font-weight:500;text-align:center;margin-bottom:4px;color:var(--color-text-primary)}
+.sfoc-h2{font-size:13px;font-weight:500;margin:16px 0 6px;color:var(--color-text-primary);border-bottom:0.5px solid var(--color-border-tertiary);padding-bottom:4px}
+.sfoc-table{width:100%;border-collapse:collapse;margin-bottom:8px;font-size:11px;table-layout:fixed}
+.sfoc-table td,.sfoc-table th{border:0.5px solid var(--color-border-tertiary);padding:5px 8px;vertical-align:top;word-wrap:break-word}
+.sfoc-table th{background:var(--color-background-secondary);font-weight:500;color:var(--color-text-secondary);font-size:10px;text-transform:uppercase;letter-spacing:.04em}
+.sfoc-p{margin-bottom:8px;color:var(--color-text-primary)}
+.sfoc-li{margin-left:16px;margin-bottom:3px}
+.sfoc-divider{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:12px 0}
+.output-actions{display:flex;gap:8px;margin-bottom:1rem;align-items:center;flex-wrap:wrap}
+.btn-action{background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:6px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px}
+.btn-action:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.ai-label{font-size:11px;color:var(--color-text-secondary);display:flex;align-items:center;gap:4px;margin-left:auto}
 </style>
-</head>
-<body>
-<div class="wrap">
 
+<div class="wrap">
 <div class="tool-header">
   <div>
     <div class="tool-title"><i class="ti ti-file-analytics" aria-hidden="true"></i> AI-assisted SFOC drafting tool</div>
-    <div class="tool-sub">Generates a Transport Canada SFOC-RPAS application draft · SORA 2.5 methodology · DroneSense Airbase</div>
+    <div class="tool-sub">Generates a Transport Canada SFOC-RPAS application draft · SORA 2.5 methodology</div>
   </div>
-  <span class="tc-badge"><i class="ti ti-flag" style="font-size:12px;vertical-align:-1px" aria-hidden="true"></i> Canada / Transport Canada</span>
+  <span class="tc-badge">Canada / Transport Canada</span>
 </div>
 
-<div style="font-size:11px;color:#6b7280;margin-bottom:10px">Select a scenario to pre-load, or enter your own details in each field:</div>
+<div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:8px">Select a scenario to pre-load or build from scratch:</div>
 <div class="scenario-row">
   <div class="sc-btn active" onclick="loadScenario('ukr',this)">
     <div class="sc-label">Scenario A</div>
-    <div class="sc-sub">BVLOS — Parrot ANAFI UKR<br>System-level mitigations</div>
+    <div class="sc-sub">BVLOS — ANAFI UKR<br>System-level mitigations</div>
   </div>
   <div class="sc-btn" onclick="loadScenario('m4td',this)">
     <div class="sc-label">Scenario B</div>
-    <div class="sc-sub">BVLOS — DJI Matrice 4TD<br>No 922.10 declaration</div>
+    <div class="sc-sub">BVLOS — DJI M4TD<br>No 922.10 declaration</div>
   </div>
   <div class="sc-btn" onclick="loadScenario('avss',this)">
     <div class="sc-label">Scenario C</div>
@@ -138,7 +106,6 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
   <div class="step-item"><div class="step-dot s-todo" id="dot-6">6</div><div class="step-label" id="lbl-6">Generate</div></div>
 </div>
 
-<!-- STEP 1 -->
 <div id="step-1">
   <div class="panel">
     <div class="panel-title"><i class="ti ti-building" aria-hidden="true"></i> Section 1 — operator details</div>
@@ -149,23 +116,16 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
       <div class="field"><label>RPOC expiry date</label><input id="rpoc-exp" type="date" /></div>
       <div class="field"><label>Mailing address</label><input id="address" type="text" /></div>
       <div class="field"><label>Province / Territory</label>
-        <select id="province">
-          <option>British Columbia</option><option>Alberta</option><option>Ontario</option>
-          <option>Quebec</option><option>Manitoba</option><option>Saskatchewan</option>
-          <option>Nova Scotia</option><option>New Brunswick</option>
-          <option>Newfoundland and Labrador</option><option>Prince Edward Island</option>
-          <option>Northwest Territories</option><option>Yukon</option><option>Nunavut</option>
-        </select>
+        <select id="province"><option>British Columbia</option><option>Alberta</option><option>Ontario</option><option>Quebec</option><option>Manitoba</option><option>Saskatchewan</option><option>Nova Scotia</option><option>New Brunswick</option><option>Newfoundland and Labrador</option><option>Prince Edward Island</option></select>
       </div>
       <div class="field"><label>Primary contact name</label><input id="contact" type="text" /></div>
       <div class="field"><label>Contact phone</label><input id="phone" type="text" /></div>
       <div class="field full"><label>Contact email</label><input id="email" type="email" /></div>
     </div>
   </div>
-  <div class="nav-row"><div></div><button class="btn-next" onclick="goStep(2)">Continue to aircraft <i class="ti ti-arrow-right" style="font-size:12px" aria-hidden="true"></i></button></div>
+  <div class="nav-row"><div></div><button class="btn-nav-next" onclick="goStep(2)">Continue to aircraft <i class="ti ti-arrow-right" style="font-size:12px" aria-hidden="true"></i></button></div>
 </div>
 
-<!-- STEP 2 -->
 <div id="step-2" style="display:none">
   <div class="panel">
     <div class="panel-title"><i class="ti ti-drone" aria-hidden="true"></i> Section 2 — aircraft details</div>
@@ -179,22 +139,18 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
       <div class="field"><label>Maximum speed (km/h)</label><input id="speed" type="text" /></div>
       <div class="field"><label>Maximum endurance (minutes)</label><input id="endurance" type="text" /></div>
       <div class="field"><label>Maximum range (km)</label><input id="range" type="text" /></div>
-      <div class="field full"><label>Declared standards held (SADs / PVDs)</label><input id="sads" type="text" placeholder="e.g. 922.04 SAD, 922.05 SAD, 922.08 SAD, 922.09 SAD, 922.11 SAD" /></div>
-      <div class="field full"><label>Pilot-in-command name(s) and TC certificate numbers</label><input id="pilots" type="text" /></div>
+      <div class="field full"><label>Declared standards (SADs/PVDs held)</label><input id="sads" type="text" placeholder="e.g. 922.04 SAD, 922.05 SAD, 922.08 SAD" /></div>
+      <div class="field full"><label>Pilot-in-command name(s) and certificate numbers</label><input id="pilots" type="text" /></div>
     </div>
   </div>
-  <div class="nav-row">
-    <button class="btn-back" onclick="goStep(1)"><i class="ti ti-arrow-left" style="font-size:12px" aria-hidden="true"></i> Back</button>
-    <button class="btn-next" onclick="goStep(3)">Continue to operation <i class="ti ti-arrow-right" style="font-size:12px" aria-hidden="true"></i></button>
-  </div>
+  <div class="nav-row"><button class="btn-nav-back" onclick="goStep(1)"><i class="ti ti-arrow-left" style="font-size:12px" aria-hidden="true"></i> Back</button><button class="btn-nav-next" onclick="goStep(3)">Continue to operation <i class="ti ti-arrow-right" style="font-size:12px" aria-hidden="true"></i></button></div>
 </div>
 
-<!-- STEP 3 -->
 <div id="step-3" style="display:none">
   <div class="panel">
     <div class="panel-title"><i class="ti ti-map" aria-hidden="true"></i> Section 3 — operation details</div>
     <div class="form-grid">
-      <div class="field full"><label>Operation description</label><textarea id="op-desc" style="min-height:90px"></textarea></div>
+      <div class="field full"><label>Operation description</label><textarea id="op-desc"></textarea></div>
       <div class="field"><label>Operation type</label>
         <select id="op-type">
           <option>BVLOS — uncontrolled airspace (Class G)</option>
@@ -205,76 +161,44 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
       </div>
       <div class="field"><label>Operational area / corridor</label><input id="area" type="text" /></div>
       <div class="field"><label>Maximum altitude AGL (metres)</label><input id="alt" type="text" /></div>
-      <div class="field"><label>Maximum lateral BVLOS distance (km)</label><input id="dist" type="text" /></div>
+      <div class="field"><label>Maximum lateral distance BVLOS (km)</label><input id="dist" type="text" /></div>
       <div class="field"><label>Proposed start date</label><input id="start-date" type="date" /></div>
       <div class="field"><label>Proposed end date</label><input id="end-date" type="date" /></div>
       <div class="field"><label>Operating hours</label><input id="hours" type="text" placeholder="e.g. Daylight hours only" /></div>
       <div class="field"><label>Airspace class</label>
-        <select id="airspace">
-          <option>Class G — uncontrolled</option>
-          <option>Class G with IFR activity</option>
-          <option>Class E</option>
-          <option>Class D</option>
-        </select>
+        <select id="airspace"><option>Class G — uncontrolled</option><option>Class G with IFR activity</option><option>Class E</option><option>Class D</option></select>
       </div>
-      <div class="field"><label>NAV CANADA authorisation reference (if held)</label><input id="nav-ref" type="text" placeholder="e.g. NAS-2024-VPD-001 or pending" /></div>
+      <div class="field"><label>NAV CANADA authorisation reference</label><input id="nav-ref" type="text" placeholder="e.g. NAS-2024-VPD-001 or pending" /></div>
     </div>
   </div>
-  <div class="nav-row">
-    <button class="btn-back" onclick="goStep(2)"><i class="ti ti-arrow-left" style="font-size:12px" aria-hidden="true"></i> Back</button>
-    <button class="btn-next" onclick="goStep(4)">Continue to risk assessment <i class="ti ti-arrow-right" style="font-size:12px" aria-hidden="true"></i></button>
-  </div>
+  <div class="nav-row"><button class="btn-nav-back" onclick="goStep(2)"><i class="ti ti-arrow-left" style="font-size:12px" aria-hidden="true"></i> Back</button><button class="btn-nav-next" onclick="goStep(4)">Continue to risk assessment <i class="ti ti-arrow-right" style="font-size:12px" aria-hidden="true"></i></button></div>
 </div>
 
-<!-- STEP 4 -->
 <div id="step-4" style="display:none">
   <div class="panel">
     <div class="panel-title"><i class="ti ti-chart-bar" aria-hidden="true"></i> Section 4 — SORA 2.5 risk assessment</div>
-    <div class="info-box"><i class="ti ti-info-circle"></i><div>SORA 2.5 is required by Transport Canada Advisory Circular AC 903-001 for SFOC-RPAS applications involving BVLOS or other higher-risk operations. Complete the fields below and click Calculate risk to derive your GRC and SAIL level.</div></div>
+    <div class="info-box"><i class="ti ti-info-circle"></i><div>SORA 2.5 is required by Transport Canada Advisory Circular AC 903-001 for SFOC-RPAS applications involving BVLOS or other higher-risk operations.</div></div>
     <div class="form-grid">
       <div class="field"><label>Population density below flight path</label>
-        <select id="pop">
-          <option value="3">Sparsely populated — intrinsic GRC 3</option>
-          <option value="4" selected>Suburban — intrinsic GRC 4</option>
-          <option value="5">Urban — intrinsic GRC 5</option>
-          <option value="6">Gathering of people — intrinsic GRC 6</option>
-        </select>
+        <select id="pop"><option value="3">Sparsely populated — intrinsic GRC 3</option><option value="4" selected>Suburban — intrinsic GRC 4</option><option value="5">Urban — intrinsic GRC 5</option><option value="6">Gathering of people — intrinsic GRC 6</option></select>
       </div>
       <div class="field"><label>Airspace risk class (ARC)</label>
-        <select id="arc">
-          <option value="a">ARC-a (very low manned traffic)</option>
-          <option value="b" selected>ARC-b (Class G uncontrolled)</option>
-          <option value="c">ARC-c (Class G with IFR traffic)</option>
-          <option value="d">ARC-d (controlled airspace)</option>
-        </select>
+        <select id="arc"><option value="a">ARC-a (very low traffic)</option><option value="b" selected>ARC-b (Class G uncontrolled)</option><option value="c">ARC-c (Class G with IFR)</option><option value="d">ARC-d (controlled)</option></select>
       </div>
       <div class="field"><label>Ground strategic mitigation (M1)</label>
-        <select id="m1">
-          <option>Time-of-day restriction (low traffic hours)</option>
-          <option>Route planning over open / clear areas</option>
-          <option>Ground exclusion zones established</option>
-          <option>None</option>
-        </select>
+        <select id="m1"><option>Time-of-day restriction (low traffic hours)</option><option>Route planning over open/clear areas</option><option>Ground exclusion zones established</option><option>None</option></select>
       </div>
       <div class="field"><label>Ground impact mitigation (M2)</label>
-        <select id="m2">
-          <option value="none">None</option>
-          <option value="frang">Frangible airframe (low kinetic energy on impact)</option>
-          <option value="chute">Parachute recovery system (AVSS PRS-M4DT)</option>
-        </select>
+        <select id="m2"><option value="none">None</option><option value="frang">Frangible airframe (low kinetic energy)</option><option value="chute">Parachute recovery system (AVSS PRS-M4DT)</option></select>
       </div>
-      <div class="field"><label>Calculated GRC (after mitigations)</label><input id="grc-out" type="text" readonly placeholder="Click Calculate risk" /></div>
-      <div class="field"><label>Calculated SAIL level</label><input id="sail-out" type="text" readonly placeholder="Click Calculate risk" /></div>
+      <div class="field"><label>Calculated GRC (after mitigations)</label><input id="grc-out" type="text" readonly /></div>
+      <div class="field"><label>Calculated SAIL level</label><input id="sail-out" type="text" readonly /></div>
     </div>
-    <button class="btn-calc" onclick="calcRisk()"><i class="ti ti-calculator" style="font-size:13px" aria-hidden="true"></i> Calculate risk</button>
+    <button onclick="calcRisk()" style="margin-top:8px;font-size:12px;padding:6px 12px">Calculate risk <i class="ti ti-calculator" style="font-size:12px" aria-hidden="true"></i></button>
   </div>
-  <div class="nav-row">
-    <button class="btn-back" onclick="goStep(3)"><i class="ti ti-arrow-left" style="font-size:12px" aria-hidden="true"></i> Back</button>
-    <button class="btn-next" onclick="goStep(5)">Continue to mitigations <i class="ti ti-arrow-right" style="font-size:12px" aria-hidden="true"></i></button>
-  </div>
+  <div class="nav-row"><button class="btn-nav-back" onclick="goStep(3)"><i class="ti ti-arrow-left" style="font-size:12px" aria-hidden="true"></i> Back</button><button class="btn-nav-next" onclick="goStep(5)">Continue to mitigations <i class="ti ti-arrow-right" style="font-size:12px" aria-hidden="true"></i></button></div>
 </div>
 
-<!-- STEP 5 -->
 <div id="step-5" style="display:none">
   <div class="panel">
     <div class="panel-title"><i class="ti ti-shield" aria-hidden="true"></i> Section 5 — detect and avoid mitigations</div>
@@ -291,7 +215,7 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
         <input type="checkbox" id="m-adsb-in" checked />
         <div class="mit-text">
           <div class="mit-name">ADS-B In — ground station traffic awareness</div>
-          <div class="mit-sub">Ground control station receiving live traffic feed via DroneSense · Pilot alert protocol documented in SOP</div>
+          <div class="mit-sub">Ground control station receiving live traffic via DroneSense · Pilot alert protocol documented in SOP</div>
         </div>
       </div>
       <div class="mit-check">
@@ -318,8 +242,8 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
       <div class="mit-check">
         <input type="checkbox" id="m-erp" checked />
         <div class="mit-text">
-          <div class="mit-name">Emergency response plan (ERP)</div>
-          <div class="mit-sub">Documented ERP covering malfunction, lost link, and airspace conflict events · Held in RPOC safety management documentation</div>
+          <div class="mit-name">Emergency response plan</div>
+          <div class="mit-sub">Documented ERP covering malfunction, lost link, and conflict events · Held in RPOC safety management documentation</div>
         </div>
       </div>
       <div class="mit-check">
@@ -333,75 +257,65 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
         <input type="checkbox" id="m-parachute" />
         <div class="mit-text">
           <div class="mit-name">Parachute recovery system fitted (AVSS PRS-M4DT)</div>
-          <div class="mit-sub">Adds 922.06 SAD capability · Reduces ground impact kinetic energy · Listed separately on TC declared drones list under AVSS</div>
+          <div class="mit-sub">Adds 922.06 SAD capability · Reduces ground impact kinetic energy · Listed separately on TC declared drones list</div>
         </div>
       </div>
     </div>
-    <div style="margin-top:14px">
-      <label style="font-size:11px;color:#6b7280;font-weight:500;display:block;margin-bottom:5px">Additional mitigations or notes for Transport Canada</label>
+    <div style="margin-top:12px">
+      <label style="font-size:11px;color:var(--color-text-secondary);display:block;margin-bottom:4px">Additional mitigations or notes for TC</label>
       <textarea id="extra-mit" placeholder="Any additional operational procedures, route restrictions, coordination arrangements, or equipment not listed above..."></textarea>
     </div>
   </div>
-  <div class="nav-row">
-    <button class="btn-back" onclick="goStep(4)"><i class="ti ti-arrow-left" style="font-size:12px" aria-hidden="true"></i> Back</button>
-    <button class="btn-generate" onclick="goStep(6)"><i class="ti ti-sparkles" style="font-size:14px" aria-hidden="true"></i> Generate SFOC draft</button>
-  </div>
+  <div class="nav-row"><button class="btn-nav-back" onclick="goStep(4)"><i class="ti ti-arrow-left" style="font-size:12px" aria-hidden="true"></i> Back</button><button class="btn-generate" onclick="goStep(6)"><i class="ti ti-sparkles" aria-hidden="true"></i> Generate SFOC draft</button></div>
 </div>
 
-<!-- STEP 6 -->
 <div id="step-6" style="display:none">
-  <div class="draft-banner"><i class="ti ti-alert-triangle" style="font-size:15px" aria-hidden="true"></i> AI-generated draft — review all content carefully before submission to Transport Canada. This tool does not constitute legal advice.</div>
   <div class="output-actions">
     <button class="btn-action" onclick="goStep(1)"><i class="ti ti-arrow-left" style="font-size:12px" aria-hidden="true"></i> Edit</button>
-    <button class="btn-print" onclick="window.print()"><i class="ti ti-printer" style="font-size:12px" aria-hidden="true"></i> Print / save as PDF</button>
-    <div class="ai-label"><i class="ti ti-sparkles" style="font-size:12px" aria-hidden="true"></i> Generated by DroneSense Airbase SFOC tool</div>
+    <button class="btn-action" onclick="window.print()"><i class="ti ti-printer" style="font-size:12px" aria-hidden="true"></i> Print / save PDF</button>
+    <button class="btn-action" onclick="sendPrompt('Review this SFOC application and tell me what Transport Canada is likely to ask about or push back on')"><i class="ti ti-message" style="font-size:12px" aria-hidden="true"></i> Get TC review feedback ↗</button>
+    <div class="ai-label"><i class="ti ti-sparkles" style="font-size:12px" aria-hidden="true"></i> AI-generated draft — verify before submission</div>
   </div>
   <div class="sfoc-output" id="sfoc-doc"></div>
 </div>
-
 </div>
 
 <script>
 const scenarios={
-  ukr:{org:'Vancouver Police Department',exec:'Chief C. Palmer',rpoc:'TC-RPOC-2024-VPD-001',address:'2120 Cambie Street, Vancouver',province:'British Columbia',contact:'Sgt. S. Kowalski',phone:'604-717-2500',email:'rpas@vpd.ca',mfr:'Parrot',model:'ANAFI UKR',reg:'C-RPAS-88134, C-RPAS-88135',serial:'SN-88134, SN-88135',weight:'0.96',speed:'55',endurance:'32',range:'4',sads:'922.04 SAD, 922.05 SAD, 922.08 SAD, 922.09 SAD, 922.11 SAD',pilots:'Sgt. S. Kowalski (TC-ADV-SK-001), Cst. J. Tran (TC-L1C-JT-002)',opDesc:'BVLOS tactical surveillance and first response support along the East Vancouver corridor. Operations will be conducted in response to active incidents requiring rapid aerial assessment and ongoing monitoring beyond the visual line of sight of the remote pilot.',opType:'BVLOS — uncontrolled airspace (Class G)',area:'East Vancouver corridor — Main St to Boundary Rd, following Hastings St alignment',alt:'120',dist:'3.2',hours:'Daylight hours only',airspace:'Class G — uncontrolled',navRef:'NAS-2024-VPD-003',pop:'4',arc:'b',m1:'Time-of-day restriction (low traffic hours)',m2:'frang',sadWarn:true,overPeople:false,vo:false,notam:false,parachute:false},
-  m4td:{org:'Surrey Fire Service',exec:'Fire Chief A. Robertson',rpoc:'TC-RPOC-2025-SFS-002',address:'14245 56 Ave, Surrey',province:'British Columbia',contact:'Capt. M. Rodriguez',phone:'604-543-6700',email:'rpas@surrey.ca',mfr:'DJI',model:'Matrice 4TD',reg:'C-RPAS-44921, C-RPAS-44922',serial:'SN-44921, SN-44922',weight:'3.97',speed:'84',endurance:'42',range:'8',sads:'922.04 SAD, 922.05 SAD, 922.08 SAD, 922.09 SAD, 922.11 SAD',pilots:'Capt. M. Rodriguez (TC-L1C-MR-003), FF D. Park (TC-L1C-DP-004)',opDesc:'BVLOS fire ground support, search and rescue coordination, and hazmat aerial assessment operations across the Surrey fire district. The DJI Dock 3 automated deployment system enables rapid response within 90 seconds of incident notification.',opType:'BVLOS — uncontrolled airspace (Class G)',area:'Surrey fire district operational area — bounded by 104 Ave, 64 Ave, King George Blvd, and 192 St',alt:'120',dist:'6.5',hours:'Daylight hours and 30 minutes post-sunset (emergency operations)',airspace:'Class G — uncontrolled',navRef:'Pending — to be submitted to NAV CANADA concurrent with this SFOC',pop:'4',arc:'b',m1:'Route planning over open / clear areas',m2:'none',sadWarn:true,overPeople:false,vo:false,notam:false,parachute:false},
-  avss:{org:'Burnaby RCMP Detachment',exec:'Supt. L. Chen',rpoc:'TC-RPOC-2025-RCMP-BRN-003',address:'6355 Deer Lake Ave, Burnaby',province:'British Columbia',contact:'Cpl. A. Singh',phone:'604-646-9999',email:'rpas.burnaby@rcmp-grc.gc.ca',mfr:'DJI',model:'Matrice 4TD with AVSS PRS-M4DT',reg:'C-RPAS-55001, C-RPAS-55002',serial:'SN-55001, SN-55002',weight:'4.35',speed:'84',endurance:'38',range:'7',sads:'922.04 SAD, 922.05 SAD, 922.06 SAD (AVSS PRS-M4DT), 922.08 SAD, 922.09 SAD, 922.11 SAD',pilots:'Cpl. A. Singh (TC-L1C-AS-005), Cst. R. Patel (TC-L1C-RP-006)',opDesc:'BVLOS public safety patrol and incident response operations over the Burnaby urban area including flights over people during active incidents. The AVSS Parachute Recovery System (PRS-M4DT) is fitted to all aircraft, providing a 922.06 SAD declaration and reducing ground impact kinetic energy in the event of an airframe malfunction.',opType:'BVLOS — over people',area:'Burnaby urban operational area — bounded by Boundary Rd, North Rd, Marine Way, and Canada Way',alt:'120',dist:'5.0',hours:'Daylight hours only',airspace:'Class G — uncontrolled',navRef:'NAS-2025-RCMP-BRN-001',pop:'5',arc:'b',m1:'Ground exclusion zones established',m2:'chute',sadWarn:false,overPeople:true,vo:false,notam:false,parachute:true}
+  ukr:{org:'Vancouver Police Department',exec:'Chief C. Palmer',rpoc:'TC-RPOC-2024-VPD-001',address:'2120 Cambie Street, Vancouver',contact:'Sgt. S. Kowalski',phone:'604-717-2500',email:'rpas@vpd.ca',mfr:'Parrot',model:'ANAFI UKR',reg:'C-RPAS-88134, C-RPAS-88135',serial:'SN-88134, SN-88135',weight:'0.96',speed:'55',endurance:'32',range:'4',sads:'922.04 SAD, 922.05 SAD, 922.08 SAD, 922.09 SAD, 922.11 SAD',pilots:'Sgt. S. Kowalski (TC-ADV-SK-001), Cst. J. Tran (TC-L1C-JT-002)',opDesc:'BVLOS tactical surveillance and first response support along the East Vancouver corridor. Operations will be conducted in response to active incidents requiring rapid aerial assessment and ongoing monitoring beyond the visual line of sight of the remote pilot.',opType:'BVLOS — uncontrolled airspace (Class G)',area:'East Vancouver corridor — Main St to Boundary Rd, following Hastings St alignment',alt:'120',dist:'3.2',hours:'Daylight hours only',airspace:'Class G — uncontrolled',navRef:'NAS-2024-VPD-003',pop:'4',arc:'b',m1:'Time-of-day restriction (low traffic hours)',m2:'frang',sadWarn:true,overPeople:false},
+  m4td:{org:'Surrey Fire Service',exec:'Fire Chief A. Robertson',rpoc:'TC-RPOC-2025-SFS-002',address:'14245 56 Ave, Surrey',contact:'Capt. M. Rodriguez',phone:'604-543-6700',email:'rpas@surrey.ca',mfr:'DJI',model:'Matrice 4TD',reg:'C-RPAS-44921, C-RPAS-44922',serial:'SN-44921, SN-44922',weight:'3.97',speed:'84',endurance:'42',range:'8',sads:'922.04 SAD, 922.05 SAD, 922.08 SAD, 922.09 SAD, 922.11 SAD',pilots:'Capt. M. Rodriguez (TC-L1C-MR-003), FF D. Park (TC-L1C-DP-004)',opDesc:'BVLOS fire ground support, search and rescue coordination, and hazmat aerial assessment operations across the Surrey fire district. The DJI Dock 3 automated deployment system enables rapid response within 90 seconds of incident notification.',opType:'BVLOS — uncontrolled airspace (Class G)',area:'Surrey fire district operational area — bounded by 104 Ave, 64 Ave, King George Blvd, and 192 St',alt:'120',dist:'6.5',hours:'Daylight hours and 30 minutes post-sunset (emergency operations)',airspace:'Class G — uncontrolled',navRef:'Pending — to be submitted to NAV CANADA concurrent with this SFOC',pop:'4',arc:'b',m1:'Route planning over open/clear areas',m2:'none',sadWarn:true,overPeople:false},
+  avss:{org:'Burnaby RCMP Detachment',exec:'Supt. L. Chen',rpoc:'TC-RPOC-2025-RCMP-BRN-003',address:'6355 Deer Lake Ave, Burnaby',contact:'Cpl. A. Singh',phone:'604-646-9999',email:'rpas.burnaby@rcmp-grc.gc.ca',mfr:'DJI',model:'Matrice 4TD with AVSS PRS-M4DT',reg:'C-RPAS-55001, C-RPAS-55002',serial:'SN-55001, SN-55002',weight:'4.35',speed:'84',endurance:'38',range:'7',sads:'922.04 SAD, 922.05 SAD, 922.06 SAD (AVSS PRS-M4DT), 922.08 SAD, 922.09 SAD, 922.11 SAD',pilots:'Cpl. A. Singh (TC-L1C-AS-005), Cst. R. Patel (TC-L1C-RP-006)',opDesc:'BVLOS public safety patrol and incident response operations over the Burnaby urban area including flights over people during active incidents. The AVSS Parachute Recovery System (PRS-M4DT) is fitted to all aircraft, providing a 922.06 SAD declaration and reducing ground impact kinetic energy.',opType:'BVLOS — over people',area:'Burnaby urban operational area — bounded by Boundary Rd, North Rd, Marine Way, and Canada Way',alt:'120',dist:'5.0',hours:'Daylight hours only',airspace:'Class G — uncontrolled',navRef:'NAS-2025-RCMP-BRN-001',pop:'5',arc:'b',m1:'Ground exclusion zones established',m2:'chute',sadWarn:false,overPeople:true}
 };
 
 let cur=1,sc='ukr';
-
-function set(id,val){const el=document.getElementById(id);if(el)el.value=val||'';}
 
 function loadScenario(id,el){
   sc=id;
   document.querySelectorAll('.sc-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   const d=scenarios[id];
-  set('org',d.org);set('exec',d.exec);set('rpoc',d.rpoc);set('address',d.address);set('contact',d.contact);set('phone',d.phone);set('email',d.email);
-  if(d.province){const p=document.getElementById('province');for(let o of p.options)if(o.text===d.province){o.selected=true;break;}}
-  set('mfr',d.mfr);set('model',d.model);set('reg',d.reg);set('serial',d.serial);set('weight',d.weight);set('speed',d.speed);set('endurance',d.endurance);set('range',d.range);set('sads',d.sads);set('pilots',d.pilots);
-  set('op-desc',d.opDesc);set('area',d.area);set('alt',d.alt);set('dist',d.dist);set('hours',d.hours);set('nav-ref',d.navRef);
-  if(d.opType){const s=document.getElementById('op-type');for(let o of s.options)if(o.text===d.opType){o.selected=true;break;}}
-  set('pop',d.pop);set('arc',d.arc);
-  if(d.m1){const s=document.getElementById('m1');for(let o of s.options)if(o.text===d.m1){o.selected=true;break;}}
-  set('m2',d.m2);
-  document.getElementById('sad-notice').style.display=d.sadWarn?'flex':'none';
-  document.getElementById('mit-notice').style.display=d.sadWarn?'flex':'none';
-  document.getElementById('m-parachute').checked=!!d.parachute;
-  document.getElementById('m-vo').checked=!!d.vo;
-  document.getElementById('m-notam').checked=!!d.notam;
+  const s=(i,v)=>{const el=document.getElementById(i);if(el)el.value=v||''};
+  s('org',d.org);s('exec',d.exec);s('rpoc',d.rpoc);s('address',d.address);s('contact',d.contact);s('phone',d.phone);s('email',d.email);
+  s('mfr',d.mfr);s('model',d.model);s('reg',d.reg);s('serial',d.serial);s('weight',d.weight);s('speed',d.speed);s('endurance',d.endurance);s('range',d.range);s('sads',d.sads);s('pilots',d.pilots);
+  s('op-desc',d.opDesc);s('area',d.area);s('alt',d.alt);s('dist',d.dist);s('hours',d.hours);s('nav-ref',d.navRef);
+  s('pop',d.pop);s('arc',d.arc);s('m1',d.m1);s('m2',d.m2);
+  const notice=document.getElementById('sad-notice');
+  const mitNotice=document.getElementById('mit-notice');
+  notice.style.display=d.sadWarn?'flex':'none';
+  mitNotice.style.display=d.sadWarn?'flex':'none';
+  document.getElementById('m-parachute').checked=d.m2==='chute';
   calcRisk();
   if(cur===6)generateDoc();
 }
 
 function calcRisk(){
   const grc=parseInt(document.getElementById('pop').value)||4;
-  const arc=document.getElementById('arc').value||'b';
-  const m2=document.getElementById('m2').value||'none';
+  const arc=document.getElementById('arc').value;
+  const m2=document.getElementById('m2').value;
   let fg=grc;
   if(m2==='frang'||m2==='chute')fg=Math.max(fg-1,1);
-  const sm={a:{1:1,2:1,3:2,4:2,5:3,6:4},b:{1:1,2:2,3:3,4:4,5:4,6:5},c:{1:3,2:3,3:4,4:5,5:5,6:6},d:{1:4,2:4,3:5,4:6,5:6,6:6}};
-  const sail=(sm[arc]||sm.b)[Math.min(fg,6)]||2;
+  const sm={'a':{'1':1,'2':1,'3':2,'4':2,'5':3,'6':4},'b':{'1':1,'2':2,'3':3,'4':4,'5':4,'6':5},'c':{'1':3,'2':3,'3':4,'4':5,'5':5,'6':6},'d':{'1':4,'2':4,'3':5,'4':6,'5':6,'6':6}};
+  const sail=sm[arc]?.[String(Math.min(fg,6))]||2;
   document.getElementById('grc-out').value='GRC '+fg+' (after mitigations)';
   document.getElementById('sail-out').value='SAIL '+['I','II','III','IV','V','VI'][sail-1];
 }
@@ -414,55 +328,42 @@ function goStep(n){
   for(let i=1;i<=6;i++){
     const dot=document.getElementById('dot-'+i);
     const lbl=document.getElementById('lbl-'+i);
-    if(i<n){dot.className='step-dot s-done';dot.innerHTML='<i class="ti ti-check" style="font-size:11px"></i>';}
+    if(i<n){dot.className='step-dot s-done';dot.innerHTML='<i class="ti ti-check" style="font-size:10px"></i>';}
     else if(i===n){dot.className='step-dot s-active';dot.textContent=i;lbl.className='step-label active';}
     else{dot.className='step-dot s-todo';dot.textContent=i;lbl.className='step-label';}
   }
-  window.scrollTo({top:0,behavior:'smooth'});
   if(n===6)generateDoc();
 }
 
-function v(id){return(document.getElementById(id)||{}).value||'';}
+function v(id){return(document.getElementById(id)||{}).value||''}
 
 function getMits(){
-  const checks=[
-    ['m-adsb-out','ADS-B Out (remote ID broadcast) — aircraft position broadcast to manned aircraft and ATC at all times during flight'],
-    ['m-adsb-in','ADS-B In (ground station traffic awareness) — live traffic feed received at ground control station with documented pilot alert protocol'],
-    ['m-utm','UTM strategic deconfliction via Aloft — pre-flight deconfliction completed before each mission; conflicts resolved before flight'],
-    ['m-vo','Visual observer (VO) network along corridor — ground-based VOs with radio communication and documented abort authority'],
-    ['m-ll','Lost-link procedure — return-to-home and hover-and-land fallback procedures documented in Standard Operating Procedures'],
-    ['m-erp','Emergency response plan — documented ERP covering airframe malfunction, lost link, and airspace conflict events'],
-    ['m-notam','NOTAM issued for operational area — advising manned aircraft of RPAS activity for each operational period'],
-    ['m-parachute','AVSS PRS-M4DT parachute recovery system fitted — reduces ground impact kinetic energy; provides 922.06 SAD capability (listed under AVSS on TC declared drones list)']
-  ];
-  const mits=checks.filter(([id])=>{const el=document.getElementById(id);return el&&el.checked;}).map(([,l])=>l);
-  const extra=v('extra-mit');if(extra.trim())mits.push(extra.trim());
+  const checks=[['m-adsb-out','ADS-B Out (remote ID broadcast) — aircraft position broadcast to manned aircraft and ATC'],['m-adsb-in','ADS-B In (ground station traffic awareness) — live traffic feed received at ground control station with pilot alert protocol'],['m-utm','UTM strategic deconfliction via Aloft — pre-flight deconfliction completed before each mission'],['m-vo','Visual observer (VO) network along corridor — ground-based VOs with radio communication and abort authority'],['m-ll','Lost-link procedure — return-to-home and hover-and-land fallback documented in SOPs'],['m-erp','Emergency response plan — documented ERP covering malfunction, lost link, and conflict events'],['m-notam','NOTAM issued for operational area — advising manned aircraft of RPAS activity'],['m-parachute','AVSS PRS-M4DT parachute recovery system fitted — reduces ground impact kinetic energy; adds 922.06 SAD capability']];
+  const mits=checks.filter(([id])=>document.getElementById(id)&&document.getElementById(id).checked).map(([,label])=>label);
+  const extra=v('extra-mit');if(extra)mits.push(extra);
   return mits;
 }
 
 function generateDoc(){
   const today=new Date().toLocaleDateString('en-CA',{year:'numeric',month:'long',day:'numeric'});
   const mits=getMits();
-  const grcFull=v('grc-out')||'GRC 4 (after mitigations)';
+  const grcFull=v('grc-out')||'GRC 4';
   const sailFull=v('sail-out')||'SAIL II';
   const overPeople=v('op-type').includes('over people');
   const d=scenarios[sc];
-  const popLabels={'3':'Sparsely populated','4':'Suburban / mixed use','5':'Urban','6':'Gathering of people'};
-  const altM=parseInt(v('alt')||0);
-  const altFt=Math.round(altM*3.28084);
+  const popLabels={'3':'Sparsely populated','4':'Suburban','5':'Urban','6':'Gathering of people'};
 
   document.getElementById('sfoc-doc').innerHTML=`
-<div style="text-align:center;margin-bottom:18px">
-  <div style="font-size:11px;color:#6b7280;margin-bottom:5px">Government of Canada &mdash; Transport Canada &mdash; Civil Aviation</div>
+<div style="text-align:center;margin-bottom:16px">
+  <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">Government of Canada — Transport Canada — Civil Aviation</div>
   <div class="sfoc-h1">Application for a Special Flight Operations Certificate</div>
-  <div style="font-size:12px;color:#6b7280;margin-top:5px">Remotely Piloted Aircraft System (SFOC-RPAS) &middot; Form 26-0835E</div>
-  <div style="font-size:11px;color:#9ca3af;margin-top:3px">Prepared: ${today} &middot; <strong style="color:#92400e">DRAFT &mdash; not for submission without review</strong></div>
+  <div style="font-size:12px;color:var(--color-text-secondary);margin-top:4px">Remotely Piloted Aircraft System (SFOC-RPAS) · Form 26-0835E</div>
+  <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">Prepared: ${today} · Status: DRAFT — not for submission without review</div>
 </div>
 <hr class="sfoc-divider">
-
-<div class="sfoc-h2">Part A &mdash; Operator identification</div>
+<div class="sfoc-h2">Part A — Operator identification</div>
 <table class="sfoc-table"><tbody>
-<tr><th style="width:36%">Field</th><th>Details</th></tr>
+<tr><th style="width:35%">Field</th><th>Details</th></tr>
 <tr><td>Organisation name</td><td>${v('org')}</td></tr>
 <tr><td>Accountable executive</td><td>${v('exec')}</td></tr>
 <tr><td>RPOC certificate number</td><td>${v('rpoc')}</td></tr>
@@ -471,10 +372,9 @@ function generateDoc(){
 <tr><td>Contact phone</td><td>${v('phone')}</td></tr>
 <tr><td>Contact email</td><td>${v('email')}</td></tr>
 </tbody></table>
-
-<div class="sfoc-h2">Part B &mdash; Aircraft details</div>
+<div class="sfoc-h2">Part B — Aircraft details</div>
 <table class="sfoc-table"><tbody>
-<tr><th style="width:36%">Field</th><th>Details</th></tr>
+<tr><th style="width:35%">Field</th><th>Details</th></tr>
 <tr><td>Manufacturer</td><td>${v('mfr')}</td></tr>
 <tr><td>Model</td><td>${v('model')}</td></tr>
 <tr><td>TC registration number(s)</td><td>${v('reg')}</td></tr>
@@ -483,66 +383,53 @@ function generateDoc(){
 <tr><td>Maximum speed</td><td>${v('speed')} km/h</td></tr>
 <tr><td>Maximum endurance</td><td>${v('endurance')} minutes</td></tr>
 <tr><td>Maximum range</td><td>${v('range')} km</td></tr>
-<tr><td>Declared standards held (SAD/PVD)</td><td>${v('sads')}</td></tr>
+<tr><td>Declared standards (SAD/PVD)</td><td>${v('sads')}</td></tr>
 <tr><td>Pilot(s)-in-command</td><td>${v('pilots')}</td></tr>
 </tbody></table>
-${d&&d.sadWarn?`<div class="sfoc-warn"><i class="ti ti-alert-triangle"></i><div>Declaration note: The ${v('model')} does not hold a 922.10 (Detect, Alert and Avoid) Pre-Validated Declaration on the Transport Canada declared drones list. The detect and avoid safety case for this application is addressed through system-level mitigations documented in Part E, in accordance with Transport Canada Advisory Circular AC 903-001.</div></div>`:''}
-
-<div class="sfoc-h2">Part C &mdash; Operation description</div>
+${d&&d.sadWarn?`<div class="warn-box" style="margin:10px 0"><i class="ti ti-alert-triangle"></i><div>Declaration note: The ${v('model')} does not hold a 922.10 (Detect, Alert and Avoid) Pre-Validated Declaration. The detect and avoid safety case for this application is addressed through system-level mitigations documented in Part E, in accordance with Transport Canada Advisory Circular AC 903-001.</div></div>`:''}
+<div class="sfoc-h2">Part C — Operation description</div>
 <div class="sfoc-p">${v('op-desc')}</div>
 <table class="sfoc-table"><tbody>
-<tr><th style="width:36%">Field</th><th>Details</th></tr>
+<tr><th style="width:35%">Field</th><th>Details</th></tr>
 <tr><td>Operation type</td><td>${v('op-type')}</td></tr>
-<tr><td>Operational area / corridor</td><td>${v('area')}</td></tr>
-<tr><td>Maximum altitude AGL</td><td>${altM} metres (${altFt} feet)</td></tr>
+<tr><td>Operational area</td><td>${v('area')}</td></tr>
+<tr><td>Maximum altitude AGL</td><td>${v('alt')} metres (${Math.round(parseInt(v('alt')||0)*3.28084)} feet)</td></tr>
 <tr><td>Maximum BVLOS distance</td><td>${v('dist')} km</td></tr>
-<tr><td>Proposed start date</td><td>${v('start-date')||'[to be confirmed]'}</td></tr>
-<tr><td>Proposed end date</td><td>${v('end-date')||'[to be confirmed]'}</td></tr>
+<tr><td>Proposed dates</td><td>${v('start-date')||'[to be confirmed]'} to ${v('end-date')||'[to be confirmed]'}</td></tr>
 <tr><td>Operating hours</td><td>${v('hours')}</td></tr>
 <tr><td>Airspace class</td><td>${v('airspace')}</td></tr>
 <tr><td>NAV CANADA authorisation ref.</td><td>${v('nav-ref')||'To be confirmed'}</td></tr>
 </tbody></table>
-${overPeople?`<div class="sfoc-info"><i class="ti ti-info-circle"></i><div>This application includes a request to conduct operations over people. The applicant submits that the risk to persons on the ground is adequately mitigated through the AVSS PRS-M4DT parachute recovery system (which provides a 922.06 SAD for this aircraft configuration), operational altitude restrictions, population exposure minimisation procedures, and the emergency response plan detailed in Part E.</div></div>`:''}
-
-<div class="sfoc-h2">Part D &mdash; SORA 2.5 risk assessment summary</div>
-<div class="sfoc-p">This application is supported by a Specific Operations Risk Assessment (SORA) completed in accordance with Transport Canada Advisory Circular AC 903-001 and the JARUS SORA 2.5 methodology. The full SORA document is attached as Appendix A to this application.</div>
+${overPeople?`<div class="info-box" style="margin:10px 0"><i class="ti ti-info-circle"></i><div>This application includes a request to conduct operations over people. The applicant submits that the risk to persons on the ground is adequately mitigated through the AVSS PRS-M4DT parachute recovery system (which provides a 922.06 SAD for this aircraft configuration), operational altitude restrictions, population exposure minimisation procedures, and the emergency response plan detailed in Part E.</div></div>`:''}
+<div class="sfoc-h2">Part D — SORA 2.5 risk assessment summary</div>
+<div class="sfoc-p">This application is supported by a Specific Operations Risk Assessment (SORA) completed in accordance with Transport Canada Advisory Circular AC 903-001 and the SORA 2.5 methodology. The full SORA document is attached as Appendix A.</div>
 <table class="sfoc-table"><tbody>
-<tr><th style="width:36%">SORA element</th><th>Outcome</th></tr>
-<tr><td>Population density below flight path</td><td>${popLabels[v('pop')]||'Suburban / mixed use'}</td></tr>
-<tr><td>Intrinsic Ground Risk Class (GRC)</td><td>GRC ${v('pop')||4}</td></tr>
+<tr><th style="width:35%">SORA element</th><th>Outcome</th></tr>
+<tr><td>Population density</td><td>${popLabels[v('pop')]||'Suburban'}</td></tr>
+<tr><td>Intrinsic GRC</td><td>${v('pop')||4}</td></tr>
 <tr><td>Air Risk Class (ARC)</td><td>ARC-${v('arc')||'b'}</td></tr>
 <tr><td>Final GRC (after mitigations)</td><td>${grcFull}</td></tr>
 <tr><td>SAIL level</td><td>${sailFull}</td></tr>
-<tr><td>M1 — strategic ground mitigation</td><td>${v('m1')}</td></tr>
-<tr><td>M2 — ground impact mitigation</td><td>${v('m2')==='chute'?'AVSS PRS-M4DT parachute recovery system fitted':v('m2')==='frang'?'Frangible airframe — low kinetic energy on impact':'None applied'}</td></tr>
+<tr><td>M1 strategic mitigation</td><td>${v('m1')}</td></tr>
+<tr><td>M2 impact mitigation</td><td>${v('m2')==='chute'?'AVSS PRS-M4DT parachute recovery system':v('m2')==='frang'?'Frangible airframe — low kinetic energy':'None'}</td></tr>
 </tbody></table>
-
-<div class="sfoc-h2">Part E &mdash; Detect and avoid mitigations</div>
-<div class="sfoc-p">The following system-level mitigations are implemented to address the airspace integration and detect and avoid requirements for BVLOS operations conducted under this application. The applicant submits that these mitigations, in combination, provide an equivalent level of safety to an onboard 922.10 Pre-Validated Declaration, and are presented in support of this SFOC application in accordance with AC 903-001.</div>
-<ul style="margin:0 0 10px 0;padding:0">
-${mits.map(m=>`<li class="sfoc-li">${m}</li>`).join('\n')}
-</ul>
-<div class="sfoc-p">The applicant confirms that all mitigations listed above are operationally active, fully documented in the Standard Operating Procedures maintained under RPOC certificate ${v('rpoc')}, and will remain in place for the duration of all operations conducted under this SFOC if granted. The applicant will notify Transport Canada immediately of any change that affects the status or effectiveness of any listed mitigation.</div>
-
-<div class="sfoc-h2">Part F &mdash; Declaration</div>
-<div class="sfoc-p">The applicant declares that the information provided in this application is true and complete to the best of their knowledge and belief. The applicant understands that providing false or misleading information in support of a Special Flight Operations Certificate application is an offence under the Aeronautics Act and may result in penalties of up to $3,000 for individuals and $15,000 for corporations. The applicant agrees to conduct all operations strictly within the conditions of any SFOC granted and to notify Transport Canada immediately of any change in circumstances, equipment, personnel, or procedures that may affect the safety of operations.</div>
-<table class="sfoc-table" style="margin-top:14px"><tbody>
-<tr><th style="width:40%">Accountable executive</th><th>Signature</th><th style="width:20%">Date</th></tr>
-<tr><td style="padding:16px 10px">${v('exec')}<br><span style="font-size:10px;color:#6b7280">${v('org')}</span></td><td style="padding:16px 10px">&nbsp;</td><td style="padding:16px 10px">&nbsp;</td></tr>
+<div class="sfoc-h2">Part E — Detect and avoid mitigations</div>
+<div class="sfoc-p">The following system-level mitigations are implemented to address the airspace integration and detect and avoid requirements for BVLOS operations. These mitigations collectively provide an equivalent level of safety to an onboard 922.10 Pre-Validated Declaration and are submitted in support of this application in accordance with AC 903-001.</div>
+<ul style="margin:0 0 8px 0">${mits.map(m=>`<li class="sfoc-li">${m}</li>`).join('')}</ul>
+<div class="sfoc-p">The applicant confirms that all mitigations listed above are operationally active, documented in the Standard Operating Procedures held under RPOC ${v('rpoc')}, and will be in place for all operations conducted under this SFOC if granted.</div>
+<div class="sfoc-h2">Part F — Declaration</div>
+<div class="sfoc-p">The applicant declares that the information provided in this application is true and complete to the best of their knowledge. The applicant understands that providing false or misleading information in support of an SFOC application is an offence under the Aeronautics Act. The applicant agrees to conduct all operations strictly within the conditions of any SFOC granted and to notify Transport Canada immediately of any change in circumstances that may affect the safety of operations.</div>
+<table class="sfoc-table" style="margin-top:12px"><tbody>
+<tr><th>Accountable executive</th><th>Signature</th><th>Date</th></tr>
+<tr><td>${v('exec')}<br><span style="font-size:10px;color:var(--color-text-secondary)">${v('org')}</span></td><td style="min-width:120px"> </td><td style="min-width:100px"> </td></tr>
 </tbody></table>
-
 <hr class="sfoc-divider">
-<div style="font-size:10px;color:#9ca3af;text-align:center;line-height:1.7">
-  Submit completed application by email to: <strong style="color:#374151">TC.RPASCentre-CentreSATP.TC@tc.gc.ca</strong><br>
-  Phone: 1-800-305-2059 &middot; Allow a minimum of 30 working days for review &middot; Fee: $2,000 (high complexity BVLOS)<br>
-  Note: Government organisations involved in emergency response operations are exempt from SFOC fees under CARs 603.67(3)<br>
-  <br>
-  This document was prepared using the DroneSense Airbase AI-assisted SFOC drafting tool &middot; AI-generated draft only &middot; Verify all content before submission &middot; Not legal advice
+<div style="font-size:10px;color:var(--color-text-secondary);text-align:center">
+Submit to: TC.RPASCentre-CentreSATP.TC@tc.gc.ca · Allow minimum 30 working days for review<br>
+AI-generated draft — verify all content before submission · Not legal advice
 </div>`;
 }
 
 loadScenario('ukr',document.querySelector('.sc-btn'));
 calcRisk();
 </script>
-</body>
-</html>
