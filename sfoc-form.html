@@ -248,8 +248,9 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
       <div class="check-item"><input type="checkbox" id="e-overpeople" /><label for="e-overpeople">Over people (with mitigations)</label></div>
     </div>
     <div class="form-grid" style="margin-top:10px">
-      <div class="field"><label>SORA SAIL level (required for (a)(b)(d)(e)(g))</label>
-        <select id="sail-level"><option>SAIL I</option><option>SAIL II</option><option>SAIL III</option><option>SAIL IV</option><option>SAIL V</option><option>SAIL VI</option></select>
+      <div class="field"><label>SORA SAIL level (auto-calculated in Step 5)</label>
+        <input id="sail-level" type="text" readonly placeholder="Complete Step 5 — SORA" style="background:#1f2937;color:#34d399;font-weight:600;cursor:default;border-color:#065f46" />
+        <span style="font-size:10px;color:#6b7280;margin-top:2px"><i>Calculated automatically from GRC and ARC — do not edit manually</i></span>
       </div>
       <div class="field"><label>Foreign commercial operation? (Part E Note 2)</label>
         <select id="foreign-hire"><option value="na">N/A</option><option value="yes">Yes</option><option value="no">No</option></select>
@@ -433,7 +434,7 @@ function loadScenario(id,el){
   document.getElementById('e-overpeople').checked=!!d.overpeople;
   document.getElementById('e-above25').checked=!!d.above25;
   document.getElementById('e-above400').checked=!!d.above400;
-  sv('sail-level',d.sailLevel);
+  // sail-level is set automatically by calcRisk() — do not set manually
   sv('op-purpose',d.opPurpose);sv('alt',d.alt);
   sv('mfr',d.mfr);sv('model',d.model);sv('reg1',d.reg1);sv('sa-level1',d.saLevel1);sv('reg2',d.reg2);sv('sa-level2',d.saLevel2);
   document.getElementById('sad-warn').style.display=d.sadWarn?'flex':'none';
