@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Airbase — Vancouver PD — Canadian Compliance Dashboard</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #0f1117; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13px; color: #e2e4e9; }
+
+  .app { display: flex; height: 100vh; overflow: hidden; }
+
+  /* SIDEBAR */
+  .sidebar { width: 200px; min-width: 200px; background: #161b27; border-right: 0.5px solid #2a3045; display: flex; flex-direction: column; overflow-y: auto; }
+  .sidebar-header { padding: 16px; border-bottom: 0.5px solid #2a3045; }
+  .org-row { display: flex; align-items: center; gap: 10px; }
+  .org-icon { width: 30px; height: 30px; background: #1e3a8a; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #93c5fd; flex-shrink: 0; }
+  .org-name { font-size: 13px; font-weight: 600; color: #e2e4e9; line-height: 1.2; }
+  .org-sub { font-size: 11px; color: #6b7280; }
+  .nav-section { padding: 8px 0; }
+  .nav-label { font-size: 10px; color: #374151; text-transform: uppercase; letter-spacing: .06em; padding: 6px 16px 4px; }
+  .nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 16px; cursor: pointer; color: #9ca3af; font-size: 12.5px; transition: background .12s, color .12s; border-left: 2px solid transparent; }
+  .nav-item:hover { background: #1f2937; color: #d1d5db; }
+  .nav-item.active { background: #1a2d4a; color: #93c5fd; border-left-color: #3b82f6; }
+  .nav-item i { font-size: 16px; flex-shrink: 0; }
+  .nav-badge { margin-left: auto; background: #78350f; color: #fbbf24; font-size: 10px; padding: 1px 6px; border-radius: 10px; font-weight: 500; }
+  .sidebar-footer { margin-top: auto; padding: 8px 0; border-top: 0.5px solid #2a3045; }
+
+  /* MAIN */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { background: #161b27; border-bottom: 0.5px solid #2a3045; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; height: 50px; flex-shrink: 0; }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .topbar-title { font-size: 14px; font-weight: 600; color: #e2e4e9; }
+  .breadcrumb { font-size: 12px; color: #4b5563; display: flex; align-items: center; gap: 5px; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .badge-ca { background: #1a2d4a; color: #93c5fd; font-size: 11px; padding: 4px 9px; border-radius: 5px; font-weight: 500; display: flex; align-items: center; gap: 4px; border: 0.5px solid #1e3a5f; }
+  .topbar-btn { background: transparent; border: 0.5px solid #2a3045; border-radius: 6px; padding: 6px 8px; color: #9ca3af; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 12px; }
+  .topbar-btn:hover { background: #1f2937; color: #e2e4e9; }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: #1e3a5f; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #93c5fd; border: 0.5px solid #2a5080; cursor: pointer; }
+
+  /* PAGES */
+  .page { display: none; flex: 1; overflow-y: auto; padding: 20px; }
+  .page.active { display: block; }
+
+  /* DASHBOARD */
+  .dash-greeting { margin-bottom: 18px; }
+  .dash-greeting h2 { font-size: 17px; font-weight: 600; color: #f3f4f6; margin-bottom: 3px; }
+  .dash-greeting p { font-size: 12px; color: #6b7280; }
+
+  .compliance-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+  .c-card { background: #161b27; border: 0.5px solid #2a3045; border-radius: 8px; padding: 14px 16px; }
+  .c-card.warn { border-color: #78350f; background: #1a130a; }
+  .c-card.err { border-color: #7f1d1d; background: #1a0d0d; }
+  .c-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .c-card-label { font-size: 11px; color: #6b7280; display: flex; align-items: center; gap: 5px; }
+  .c-card-icon { font-size: 14px; }
+  .c-card-value { font-size: 20px; font-weight: 600; line-height: 1; margin-bottom: 3px; }
+  .c-card-sub { font-size: 11px; }
+  .val-ok { color: #34d399; }
+  .val-warn { color: #fbbf24; }
+  .val-err { color: #f87171; }
+  .val-muted { color: #9ca3af; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  .dot-ok { background: #34d399; }
+  .dot-warn { background: #fbbf24; }
+  .dot-err { background: #f87171; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .panel { background: #161b27; border: 0.5px solid #2a3045; border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .panel-title { font-size: 13px; font-weight: 600; color: #e2e4e9; display: flex; align-items: center; gap: 7px; }
+  .panel-title i { font-size: 15px; color: #4b5563; }
+  .panel-sub { font-size: 11px; color: #4b5563; }
+
+  .btn-sm { background: #1a2d4a; color: #93c5fd; border: 0.5px solid #1e3a5f; border-radius: 5px; padding: 5px 10px; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+  .btn-sm:hover { background: #1e3a6a; }
+  .btn-primary { background: #1d4ed8; color: #fff; border: none; border-radius: 6px; padding: 7px 14px; font-size: 12px; cursor: pointer; font-weight: 500; display: inline-flex; align-items: center; gap: 5px; }
+  .btn-primary:hover { background: #1e40af; }
+  .btn-ghost { background: transparent; color: #9ca3af; border: 0.5px solid #2a3045; border-radius: 5px; padding: 6px 12px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+  .btn-ghost:hover { background: #1f2937; color: #e2e4e9; }
+
+  .alert-box { display: flex; align-items: flex-start; gap: 10px; padding: 11px 14px; background: #1c1008; border: 0.5px solid #92400e; border-radius: 7px; margin-bottom: 10px; }
+  .alert-box i { color: #fbbf24; font-size: 16px; margin-top: 1px; flex-shrink: 0; }
+  .alert-title { font-size: 12px; font-weight: 600; color: #fbbf24; margin-bottom: 2px; }
+  .alert-text { font-size: 12px; color: #d97706; line-height: 1.5; }
+  .info-box { display: flex; align-items: flex-start; gap: 10px; padding: 11px 14px; background: #0c1e35; border: 0.5px solid #1e3a5f; border-radius: 7px; margin-bottom: 10px; }
+  .info-box i { color: #60a5fa; font-size: 16px; margin-top: 1px; flex-shrink: 0; }
+  .info-text { font-size: 12px; color: #93c5fd; line-height: 1.5; }
+  .info-link { color: #60a5fa; text-decoration: underline; cursor: pointer; }
+
+  .activity-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 0.5px solid #1f2937; }
+  .activity-row:last-child { border-bottom: none; }
+  .act-dot { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0; }
+  .act-ok { background: #064e3b; color: #34d399; }
+  .act-warn { background: #78350f; color: #fbbf24; }
+  .act-info { background: #1e3a5f; color: #93c5fd; }
+  .act-text { font-size: 12px; color: #d1d5db; }
+  .act-time { font-size: 11px; color: #4b5563; margin-left: auto; white-space: nowrap; }
+
+  /* CERT PAGE */
+  .cert-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cert-card { background: #0f1117; border: 0.5px solid #2a3045; border-radius: 8px; padding: 14px; cursor: pointer; transition: border-color .15s; }
+  .cert-card:hover { border-color: #3b82f6; }
+  .cert-card.warn-border { border-color: #92400e; }
+  .cert-issuer { font-size: 10px; color: #6b7280; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+  .cert-name { font-size: 12.5px; font-weight: 600; color: #e2e4e9; margin-bottom: 10px; line-height: 1.3; }
+  .cert-footer { display: flex; align-items: center; justify-content: space-between; }
+  .pilots-row { display: flex; }
+  .pilot-av { width: 22px; height: 22px; border-radius: 50%; background: #374151; border: 1.5px solid #161b27; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: #9ca3af; margin-left: -5px; }
+  .pilot-av:first-child { margin-left: 0; }
+  .tag { font-size: 10px; padding: 2px 7px; border-radius: 3px; font-weight: 500; }
+  .tag-ok { background: #064e3b; color: #34d399; }
+  .tag-warn { background: #78350f; color: #fbbf24; }
+  .tag-err { background: #7f1d1d; color: #f87171; }
+  .tag-grey { background: #1f2937; color: #6b7280; }
+  .tag-blue { background: #1e3a5f; color: #93c5fd; }
+  .sfoc-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 0.5px solid #1f2937; }
+  .sfoc-row:last-child { border-bottom: none; }
+  .sfoc-name { font-size: 12.5px; font-weight: 500; color: #e2e4e9; margin-bottom: 3px; }
+  .sfoc-meta { font-size: 11px; color: #6b7280; line-height: 1.5; }
+  .training-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid #1f2937; }
+  .training-row:last-child { border-bottom: none; }
+  .t-num { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0; }
+  .t-ok { background: #064e3b; color: #34d399; }
+  .t-prog { background: #1e3a5f; color: #93c5fd; }
+  .t-text { font-size: 12px; color: #d1d5db; }
+  .t-text.muted { color: #6b7280; }
+
+  /* HARDWARE PAGE */
+  .hw-section { margin-bottom: 14px; }
+  .hw-aircraft-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 0.5px solid #1f2937; }
+  .hw-aircraft-row:last-child { border-bottom: none; }
+  .hw-name { font-size: 12.5px; font-weight: 500; color: #e2e4e9; margin-bottom: 2px; }
+  .hw-reg { font-size: 11px; color: #6b7280; }
+  .sad-pills { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; max-width: 280px; }
+  .sad { font-size: 10px; padding: 2px 6px; border-radius: 3px; font-weight: 500; }
+  .sad-ok { background: #064e3b; color: #34d399; }
+  .sad-no { background: #1f2937; color: #374151; }
+
+  /* SAFETY PAGE */
+  .risk-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .risk-label { font-size: 12px; color: #9ca3af; width: 180px; flex-shrink: 0; }
+  .risk-bar-wrap { flex: 1; height: 6px; background: #1f2937; border-radius: 3px; overflow: hidden; }
+  .risk-bar { height: 100%; border-radius: 3px; }
+  .risk-val { font-size: 13px; font-weight: 600; width: 28px; text-align: right; }
+  .mit-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid #1f2937; }
+  .mit-row:last-child { border-bottom: none; }
+  .mit-name { font-size: 12px; color: #e2e4e9; flex: 1; }
+  .mit-sub { font-size: 11px; color: #6b7280; }
+  .oso-row { display: flex; align-items: flex-start; gap: 9px; padding: 8px 0; border-bottom: 0.5px solid #1f2937; }
+  .oso-row:last-child { border-bottom: none; }
+  .oso-icon { width: 18px; height: 18px; border-radius: 4px; border: 0.5px solid #374151; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .oso-ok { background: #064e3b; border-color: #065f46; }
+  .oso-warn { background: #78350f; border-color: #92400e; }
+  .oso-text { font-size: 12px; color: #9ca3af; flex: 1; }
+  .oso-text.done { color: #d1d5db; }
+  .oso-sail { font-size: 10px; padding: 2px 5px; border-radius: 3px; background: #1f2937; color: #6b7280; white-space: nowrap; }
+
+  /* PLACEHOLDER PAGES */
+  .placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: #374151; }
+  .placeholder i { font-size: 36px; margin-bottom: 10px; }
+  .placeholder p { font-size: 13px; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #2a3045; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #374151; }
+
+  .divider { height: 0.5px; background: #1f2937; margin: 12px 0; }
+  .section-heading { font-size: 11px; color: #4b5563; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="org-row">
+        <div class="org-icon">AB</div>
+        <div>
+          <div class="org-name">Airbase</div>
+          <div class="org-sub">Vancouver PD</div>
+        </div>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-item active" onclick="nav('dashboard',this)"><i class="ti ti-home"></i> Dashboard</div>
+      <div class="nav-item" onclick="nav('missions',this)"><i class="ti ti-plane"></i> Flights &amp; missions</div>
+      <div class="nav-item" onclick="nav('planning',this)"><i class="ti ti-map"></i> Planning</div>
+      <div class="nav-item" onclick="nav('members',this)"><i class="ti ti-users"></i> Members &amp; teams</div>
+      <div class="nav-item" onclick="nav('cert',this)"><i class="ti ti-certificate"></i> Certification</div>
+      <div class="nav-item" onclick="nav('hardware',this)"><i class="ti ti-drone"></i> Hardware</div>
+      <div class="nav-item" onclick="nav('maintenance',this)"><i class="ti ti-tool"></i> Maintenance</div>
+      <div class="nav-item" onclick="nav('safety',this)"><i class="ti ti-shield"></i> Safety <span class="nav-badge">1</span></div>
+      <div class="nav-item" onclick="nav('reporting',this)"><i class="ti ti-chart-bar"></i> Reporting</div>
+      <div class="nav-item" onclick="nav('resources',this)"><i class="ti ti-books"></i> Resources</div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="nav-item" onclick="nav('settings',this)"><i class="ti ti-settings"></i> Settings</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="topbar-title" id="page-title">Dashboard</div>
+        <div class="breadcrumb"><i class="ti ti-chevron-right" style="font-size:12px"></i> <span id="breadcrumb-sub" style="color:#6b7280">Overview</span></div>
+      </div>
+      <div class="topbar-right">
+        <span class="badge-ca"><i class="ti ti-flag" style="font-size:12px"></i> Canada / Transport Canada</span>
+        <button class="topbar-btn"><i class="ti ti-bell" style="font-size:14px"></i></button>
+        <div class="avatar">AR</div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="dash-greeting">
+        <h2>Compliance overview</h2>
+        <p>Vancouver Police Department DFR Program &mdash; last updated today</p>
+      </div>
+
+      <div class="compliance-grid">
+        <div class="c-card">
+          <div class="c-card-top">
+            <div class="c-card-label"><span class="dot dot-ok"></span> RPOC status</div>
+            <i class="ti ti-certificate c-card-icon" style="color:#34d399"></i>
+          </div>
+          <div class="c-card-value val-ok">Active</div>
+          <div class="c-card-sub val-muted">Expires 14 Mar 2027</div>
+        </div>
+        <div class="c-card warn">
+          <div class="c-card-top">
+            <div class="c-card-label"><span class="dot dot-warn"></span> Active SFOCs</div>
+            <i class="ti ti-file-check c-card-icon" style="color:#fbbf24"></i>
+          </div>
+          <div class="c-card-value val-warn">2 / 3</div>
+          <div class="c-card-sub val-warn">1 expiring in 28 days</div>
+        </div>
+        <div class="c-card">
+          <div class="c-card-top">
+            <div class="c-card-label"><span class="dot dot-ok"></span> Pilot currency</div>
+            <i class="ti ti-users c-card-icon" style="color:#34d399"></i>
+          </div>
+          <div class="c-card-value val-ok">6 / 6</div>
+          <div class="c-card-sub val-muted">All certificates current</div>
+        </div>
+        <div class="c-card err">
+          <div class="c-card-top">
+            <div class="c-card-label"><span class="dot dot-err"></span> Aircraft declarations</div>
+            <i class="ti ti-drone c-card-icon" style="color:#f87171"></i>
+          </div>
+          <div class="c-card-value val-err">4 / 6</div>
+          <div class="c-card-sub val-err">2 aircraft missing 922.10</div>
+        </div>
+        <div class="c-card">
+          <div class="c-card-top">
+            <div class="c-card-label"><span class="dot dot-ok"></span> Airspace auth</div>
+            <i class="ti ti-map-pin c-card-icon" style="color:#34d399"></i>
+          </div>
+          <div class="c-card-value val-ok">Active</div>
+          <div class="c-card-sub val-muted">NAV CANADA &mdash; standing auth</div>
+        </div>
+        <div class="c-card warn">
+          <div class="c-card-top">
+            <div class="c-card-label"><span class="dot dot-warn"></span> SORA review</div>
+            <i class="ti ti-file-analytics c-card-icon" style="color:#fbbf24"></i>
+          </div>
+          <div class="c-card-value val-warn">Due</div>
+          <div class="c-card-sub val-warn">Last updated 8 months ago</div>
+        </div>
+      </div>
+
+      <div class="alert-box">
+        <i class="ti ti-alert-triangle"></i>
+        <div><div class="alert-title">SFOC renewal required</div><div class="alert-text">SFOC-2024-VPD-003 (BVLOS Corridor &mdash; East Van) expires 1 Jul 2026. Renewal application must be submitted at least 30 working days in advance to TC.RPASCentre-CentreSATP.TC@tc.gc.ca.</div></div>
+      </div>
+      <div class="alert-box">
+        <i class="ti ti-alert-triangle"></i>
+        <div><div class="alert-title">Aircraft declaration gap &mdash; BVLOS restricted</div><div class="alert-text">2 &times; Parrot ANAFI UKR lack a 922.10 Detect and Avoid declaration. BVLOS missions must not be assigned to these aircraft without a valid covering SFOC.</div></div>
+      </div>
+      <div class="info-box">
+        <i class="ti ti-info-circle"></i>
+        <div class="info-text">SORA for East Van BVLOS corridor was last reviewed 8 months ago. Annual review is recommended. <span class="info-link" onclick="nav('safety',document.querySelector('[onclick*=safety]'))">Open SORA module &rarr;</span></div>
+      </div>
+
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><i class="ti ti-activity"></i> Recent activity</div>
+          </div>
+          <div class="activity-row">
+            <div class="act-dot act-ok"><i class="ti ti-check" style="font-size:11px"></i></div>
+            <div class="act-text">Pilot cert uploaded &mdash; S. Kowalski, Level 1 Complex</div>
+            <div class="act-time">2 days ago</div>
+          </div>
+          <div class="activity-row">
+            <div class="act-dot act-ok"><i class="ti ti-check" style="font-size:11px"></i></div>
+            <div class="act-text">Aircraft registered &mdash; DJI M4TD #SN-44921</div>
+            <div class="act-time">5 days ago</div>
+          </div>
+          <div class="activity-row">
+            <div class="act-dot act-warn">!</div>
+            <div class="act-text" style="color:#fbbf24">SFOC-2024-VPD-003 renewal not yet initiated</div>
+            <div class="act-time">28d left</div>
+          </div>
+          <div class="activity-row">
+            <div class="act-dot act-ok"><i class="ti ti-check" style="font-size:11px"></i></div>
+            <div class="act-text">SORA export downloaded for TC submission</div>
+            <div class="act-time">8 mo ago</div>
+          </div>
+          <div class="activity-row">
+            <div class="act-dot act-info"><i class="ti ti-drone" style="font-size:11px"></i></div>
+            <div class="act-text">Dock 3 Site Alpha &mdash; automated mission completed</div>
+            <div class="act-time">Yesterday</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><i class="ti ti-checklist"></i> Compliance checklist</div>
+            <span style="font-size:11px;color:#34d399">4 / 6 complete</span>
+          </div>
+          <div class="activity-row">
+            <div class="act-dot act-ok"><i class="ti ti-check" style="font-size:11px"></i></div>
+            <div class="act-text">RPOC issued and current</div>
+          </div>
+          <div class="activity-row">
+            <div class="act-dot act-warn">!</div>
+            <div class="act-text" style="color:#fbbf24">SFOC-2024-VPD-003 &mdash; renew before 1 Jul</div>
+          </div>
+          <div class="activity-row">
+            <div class="act-dot act-ok"><i class="ti ti-check" style="font-size:11px"></i></div>
+            <div class="act-text">All pilot certificates current</div>
+          </div>
+          <div class="activity-row">
+            <div class="act-dot act-warn">!</div>
+            <div class="act-text" style="color:#fbbf24">SORA annual review overdue</div>
+          </div>
+          <div class="activity-row">
+            <div class="act-dot act-ok"><i class="ti ti-check" style="font-size:11px"></i></div>
+            <div class="act-text">NAV CANADA airspace auth active</div>
+          </div>
+          <div class="activity-row">
+            <div class="act-dot act-ok"><i class="ti ti-check" style="font-size:11px"></i></div>
+            <div class="act-text">Aircraft registration current &mdash; 6 aircraft</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CERTIFICATION -->
+    <div class="page" id="page-cert">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div><div style="font-size:16px;font-weight:600;color:#f3f4f6">Certification</div><div style="font-size:12px;color:#6b7280;margin-top:2px">Certificates, endorsements and training records</div></div>
+        <button class="btn-primary"><i class="ti ti-plus" style="font-size:12px"></i> Add certificate</button>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title"><i class="ti ti-certificate"></i> Certificates</div></div>
+        <div class="cert-grid">
+          <div class="cert-card">
+            <div class="cert-issuer"><i class="ti ti-flag" style="font-size:11px"></i> Transport Canada</div>
+            <div class="cert-name">RPAS Operator Certificate (RPOC)</div>
+            <div class="cert-footer">
+              <div class="pilots-row"><div class="pilot-av">VPD</div></div>
+              <span class="tag tag-ok">Active &middot; exp Mar 2027</span>
+            </div>
+          </div>
+          <div class="cert-card">
+            <div class="cert-issuer"><i class="ti ti-flag" style="font-size:11px"></i> Transport Canada</div>
+            <div class="cert-name">Advanced RPAS pilot certificate</div>
+            <div class="cert-footer">
+              <div class="pilots-row"><div class="pilot-av">SK</div><div class="pilot-av">JT</div><div class="pilot-av">MR</div><div class="pilot-av">+3</div></div>
+              <span class="tag tag-ok">6 current</span>
+            </div>
+          </div>
+          <div class="cert-card">
+            <div class="cert-issuer"><i class="ti ti-flag" style="font-size:11px"></i> Transport Canada</div>
+            <div class="cert-name">Level 1 Complex pilot certificate</div>
+            <div class="cert-footer">
+              <div class="pilots-row"><div class="pilot-av">SK</div><div class="pilot-av">JT</div></div>
+              <span class="tag tag-ok">2 current</span>
+            </div>
+          </div>
+          <div class="cert-card warn-border">
+            <div class="cert-issuer"><i class="ti ti-flag" style="font-size:11px"></i> Transport Canada</div>
+            <div class="cert-name">Level 1 Complex &mdash; enrolment pending</div>
+            <div class="cert-footer">
+              <div class="pilots-row"><div class="pilot-av">MR</div><div class="pilot-av">DP</div></div>
+              <span class="tag tag-warn">2 in training</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><i class="ti ti-file-check"></i> Endorsements (SFOCs)</div>
+          <button class="btn-sm"><i class="ti ti-upload" style="font-size:11px"></i> Upload SFOC</button>
+        </div>
+        <div class="sfoc-row">
+          <div><div class="sfoc-name">SFOC-2024-VPD-001 &mdash; BVLOS patrol, North Shore corridor</div><div class="sfoc-meta">TC issued &middot; Aircraft: M4TD #44921, #44922 &middot; Pilots: SK, JT</div></div>
+          <span class="tag tag-ok">Exp Jan 2027</span>
+        </div>
+        <div class="sfoc-row">
+          <div><div class="sfoc-name">SFOC-2024-VPD-002 &mdash; BVLOS + over people, Downtown core</div><div class="sfoc-meta">TC issued &middot; Aircraft: M4TD #44921 &middot; Pilot: SK</div></div>
+          <span class="tag tag-ok">Exp Sep 2026</span>
+        </div>
+        <div class="sfoc-row">
+          <div><div class="sfoc-name">SFOC-2024-VPD-003 &mdash; BVLOS corridor, East Van</div><div class="sfoc-meta">TC issued &middot; Aircraft: UKR #88134, #88135 &middot; Pilots: MR, JT</div></div>
+          <span class="tag tag-warn">Exp 1 Jul 2026</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><i class="ti ti-school"></i> Training events</div>
+          <button class="btn-sm"><i class="ti ti-plus" style="font-size:11px"></i> Add</button>
+        </div>
+        <div class="training-row"><div class="t-num t-ok"><i class="ti ti-check" style="font-size:10px"></i></div><div class="t-text">Level 1 Complex ground school &mdash; S. Kowalski (22 hrs) &middot; Completed Apr 2026</div></div>
+        <div class="training-row"><div class="t-num t-ok"><i class="ti ti-check" style="font-size:10px"></i></div><div class="t-text">Level 1 Complex ground school &mdash; J. Tran (21 hrs) &middot; Completed Apr 2026</div></div>
+        <div class="training-row"><div class="t-num t-prog" style="font-size:10px;font-weight:600">3</div><div class="t-text muted">Level 1 Complex ground school &mdash; M. Rodriguez (14/20 hrs) &middot; In progress</div></div>
+        <div class="training-row"><div class="t-num t-prog" style="font-size:10px;font-weight:600">4</div><div class="t-text muted">Level 1 Complex ground school &mdash; D. Park (8/20 hrs) &middot; In progress</div></div>
+      </div>
+    </div>
+
+    <!-- HARDWARE -->
+    <div class="page" id="page-hardware">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div><div style="font-size:16px;font-weight:600;color:#f3f4f6">Hardware</div><div style="font-size:12px;color:#6b7280;margin-top:2px">Aircraft registration and TC declaration status</div></div>
+        <button class="btn-primary"><i class="ti ti-plus" style="font-size:12px"></i> Add aircraft</button>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><i class="ti ti-drone"></i> DJI Matrice 4TD (Dock 3)</div>
+          <span class="tag tag-ok">2 aircraft &middot; registered</span>
+        </div>
+        <div style="font-size:11px;color:#6b7280;margin-bottom:12px;padding-bottom:10px;border-bottom:0.5px solid #1f2937">Manufacturer: DJI &middot; Weight: small (&lt;25kg) &middot; Dock: DJI Dock 3 &middot; <span style="color:#4b5563">Declaration verified 3 Jun 2026</span></div>
+        <div class="hw-aircraft-row">
+          <div><div class="hw-name">DJI Matrice 4TD &middot; #SN-44921</div><div class="hw-reg">TC Reg: C-RPAS-44921 &middot; Dock 3 station: Site Alpha &middot; Assigned: S. Kowalski</div></div>
+          <div class="sad-pills">
+            <span class="sad sad-ok">922.04</span><span class="sad sad-ok">922.05</span><span class="sad sad-no">922.06</span><span class="sad sad-no">922.07</span><span class="sad sad-ok">922.08</span><span class="sad sad-ok">922.09</span><span class="sad sad-no">922.10</span><span class="sad sad-ok">922.11</span><span class="sad sad-no">922.12</span>
+          </div>
+        </div>
+        <div class="hw-aircraft-row">
+          <div><div class="hw-name">DJI Matrice 4TD &middot; #SN-44922</div><div class="hw-reg">TC Reg: C-RPAS-44922 &middot; Dock 3 station: Site Bravo &middot; Assigned: J. Tran</div></div>
+          <div class="sad-pills">
+            <span class="sad sad-ok">922.04</span><span class="sad sad-ok">922.05</span><span class="sad sad-no">922.06</span><span class="sad sad-no">922.07</span><span class="sad sad-ok">922.08</span><span class="sad sad-ok">922.09</span><span class="sad sad-no">922.10</span><span class="sad sad-ok">922.11</span><span class="sad sad-no">922.12</span>
+          </div>
+        </div>
+        <div class="alert-box" style="margin-top:10px;margin-bottom:0">
+          <i class="ti ti-alert-triangle"></i>
+          <div class="alert-text">922.06 and 922.10 not declared on standard M4TD. BVLOS and over-people operations require a valid SFOC. AVSS PRS-M4DT parachute system adds 922.06 if fitted (listed separately on TC declared drones list).</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><i class="ti ti-drone"></i> Parrot ANAFI UKR</div>
+          <span class="tag tag-warn">4 aircraft &middot; declaration gap</span>
+        </div>
+        <div style="font-size:11px;color:#6b7280;margin-bottom:12px;padding-bottom:10px;border-bottom:0.5px solid #1f2937">Manufacturer: Parrot &middot; Weight: small (&lt;25kg) &middot; <span style="color:#4b5563">Declaration verified 3 Jun 2026</span></div>
+        <div class="hw-aircraft-row">
+          <div><div class="hw-name">ANAFI UKR &middot; #SN-88134</div><div class="hw-reg">TC Reg: C-RPAS-88134 &middot; Assigned: M. Rodriguez</div></div>
+          <div class="sad-pills">
+            <span class="sad sad-ok">922.04</span><span class="sad sad-ok">922.05</span><span class="sad sad-no">922.06</span><span class="sad sad-no">922.07</span><span class="sad sad-ok">922.08</span><span class="sad sad-ok">922.09</span><span class="sad sad-no">922.10</span><span class="sad sad-ok">922.11</span><span class="sad sad-no">922.12</span>
+          </div>
+        </div>
+        <div class="hw-aircraft-row">
+          <div><div class="hw-name">ANAFI UKR &middot; #SN-88135</div><div class="hw-reg">TC Reg: C-RPAS-88135 &middot; Assigned: J. Tran</div></div>
+          <div class="sad-pills">
+            <span class="sad sad-ok">922.04</span><span class="sad sad-ok">922.05</span><span class="sad sad-no">922.06</span><span class="sad sad-no">922.07</span><span class="sad sad-ok">922.08</span><span class="sad sad-ok">922.09</span><span class="sad sad-no">922.10</span><span class="sad sad-ok">922.11</span><span class="sad sad-no">922.12</span>
+          </div>
+        </div>
+        <div class="alert-box" style="margin-top:10px;margin-bottom:0">
+          <i class="ti ti-alert-triangle"></i>
+          <div class="alert-text">922.06, 922.10, and 922.12 not declared. BVLOS requires SFOC. No hardware modification pathway available for 922.10 on UKR.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAFETY -->
+    <div class="page" id="page-safety">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div><div style="font-size:16px;font-weight:600;color:#f3f4f6">Safety &mdash; SORA module</div><div style="font-size:12px;color:#6b7280;margin-top:2px">SORA 2.5 &middot; Transport Canada SFOC support</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-ghost"><i class="ti ti-download" style="font-size:12px"></i> Export PDF</button>
+          <button class="btn-primary"><i class="ti ti-edit" style="font-size:12px"></i> Edit SORA</button>
+        </div>
+      </div>
+
+      <div style="font-size:11px;color:#4b5563;margin-bottom:14px">East Van BVLOS corridor &middot; SFOC ref: SFOC-2024-VPD-003 &middot; Version 2 &middot; Last updated 8 months ago <span class="tag tag-warn" style="margin-left:6px">Review due</span></div>
+
+      <div class="two-col">
+        <div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><i class="ti ti-chart-bar"></i> Risk outcome</div></div>
+            <div class="risk-row"><div class="risk-label">Ground risk class (GRC)</div><div class="risk-bar-wrap"><div class="risk-bar" style="width:55%;background:#fbbf24"></div></div><div class="risk-val" style="color:#fbbf24">4</div></div>
+            <div class="risk-row"><div class="risk-label">Air risk class (ARC)</div><div class="risk-bar-wrap"><div class="risk-bar" style="width:25%;background:#34d399"></div></div><div class="risk-val" style="color:#34d399">b</div></div>
+            <div class="risk-row"><div class="risk-label">SAIL level</div><div class="risk-bar-wrap"><div class="risk-bar" style="width:33%;background:#60a5fa"></div></div><div class="risk-val" style="color:#60a5fa">II</div></div>
+            <div class="divider"></div>
+            <div style="display:flex;gap:10px">
+              <div style="flex:1;background:#0f1117;border:0.5px solid #2a3045;border-radius:6px;padding:10px;text-align:center"><div style="font-size:10px;color:#6b7280;margin-bottom:4px">GRC</div><div style="font-size:22px;font-weight:600;color:#fbbf24">4</div></div>
+              <div style="flex:1;background:#0f1117;border:0.5px solid #2a3045;border-radius:6px;padding:10px;text-align:center"><div style="font-size:10px;color:#6b7280;margin-bottom:4px">ARC</div><div style="font-size:22px;font-weight:600;color:#34d399">b</div></div>
+              <div style="flex:1;background:#0f1117;border:0.5px solid #2a3045;border-radius:6px;padding:10px;text-align:center"><div style="font-size:10px;color:#6b7280;margin-bottom:4px">SAIL</div><div style="font-size:22px;font-weight:600;color:#60a5fa">II</div></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><i class="ti ti-shield"></i> Detect &amp; avoid mitigations</div></div>
+            <div class="info-box" style="margin-bottom:10px">
+              <i class="ti ti-info-circle"></i>
+              <div class="info-text">ANAFI UKR has no 922.10 declaration. System-level mitigations below support the SFOC detect and avoid requirement.</div>
+            </div>
+            <div class="mit-row">
+              <i class="ti ti-check" style="color:#34d399;font-size:14px;flex-shrink:0"></i>
+              <div><div class="mit-name">ADS-B Out &mdash; remote ID broadcast</div><div class="mit-sub">Active on all UKR serials via DroneSense</div></div>
+              <span class="tag tag-blue">Strategic</span>
+            </div>
+            <div class="mit-row">
+              <i class="ti ti-check" style="color:#34d399;font-size:14px;flex-shrink:0"></i>
+              <div><div class="mit-name">ADS-B In &mdash; ground station traffic awareness</div><div class="mit-sub">DroneSense platform receiving live traffic feed</div></div>
+              <span class="tag tag-blue">Tactical</span>
+            </div>
+            <div class="mit-row">
+              <i class="ti ti-check" style="color:#34d399;font-size:14px;flex-shrink:0"></i>
+              <div><div class="mit-name">Aloft UTM integration</div><div class="mit-sub">Strategic deconfliction &middot; connected and active</div></div>
+              <span class="tag tag-blue">Strategic</span>
+            </div>
+            <div class="mit-row">
+              <i class="ti ti-check" style="color:#34d399;font-size:14px;flex-shrink:0"></i>
+              <div><div class="mit-name">Visual observer (VO) network</div><div class="mit-sub">3 VOs deployed along corridor &middot; documented in SOP-04</div></div>
+              <span class="tag tag-blue">Tactical</span>
+            </div>
+            <div class="mit-row">
+              <i class="ti ti-check" style="color:#34d399;font-size:14px;flex-shrink:0"></i>
+              <div><div class="mit-name">Lost-link procedure documented</div><div class="mit-sub">RTH within 10s &middot; SOP-03</div></div>
+              <span class="tag tag-blue">Procedural</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><i class="ti ti-list-check"></i> OSO checklist &mdash; SAIL II</div>
+              <span style="font-size:11px;color:#34d399">9 / 10 complete</span>
+            </div>
+            <div class="oso-row">
+              <div class="oso-icon oso-ok"><i class="ti ti-check" style="font-size:10px;color:#34d399"></i></div>
+              <div class="oso-text done">OSO-01 Operator competence and approval</div>
+              <span class="oso-sail">SAIL I+</span>
+            </div>
+            <div class="oso-row">
+              <div class="oso-icon oso-ok"><i class="ti ti-check" style="font-size:10px;color:#34d399"></i></div>
+              <div class="oso-text done">OSO-02 UAS manufactured to design standards</div>
+              <span class="oso-sail">SAIL I+</span>
+            </div>
+            <div class="oso-row">
+              <div class="oso-icon oso-ok"><i class="ti ti-check" style="font-size:10px;color:#34d399"></i></div>
+              <div class="oso-text done">OSO-03 UAS maintained per manufacturer instructions</div>
+              <span class="oso-sail">SAIL I+</span>
+            </div>
+            <div class="oso-row">
+              <div class="oso-icon oso-ok"><i class="ti ti-check" style="font-size:10px;color:#34d399"></i></div>
+              <div class="oso-text done">OSO-06 C2 link performance documented</div>
+              <span class="oso-sail">SAIL II+</span>
+            </div>
+            <div class="oso-row">
+              <div class="oso-icon oso-ok"><i class="ti ti-check" style="font-size:10px;color:#34d399"></i></div>
+              <div class="oso-text done">OSO-07 Detect and avoid &mdash; system mitigations active</div>
+              <span class="oso-sail">SAIL II+</span>
+            </div>
+            <div class="oso-row">
+              <div class="oso-icon oso-warn"><i class="ti ti-alert-triangle" style="font-size:10px;color:#fbbf24"></i></div>
+              <div class="oso-text" style="color:#fbbf24">OSO-09 Pilot recurrency &mdash; review overdue for 2 pilots</div>
+              <span class="oso-sail" style="background:#78350f;color:#fbbf24">Action</span>
+            </div>
+            <div class="oso-row">
+              <div class="oso-icon oso-ok"><i class="ti ti-check" style="font-size:10px;color:#34d399"></i></div>
+              <div class="oso-text done">OSO-10 Multi-pilot operations procedures documented</div>
+              <span class="oso-sail">SAIL II+</span>
+            </div>
+            <div class="oso-row">
+              <div class="oso-icon oso-ok"><i class="ti ti-check" style="font-size:10px;color:#34d399"></i></div>
+              <div class="oso-text done">OSO-20 Emergency response plan in place</div>
+              <span class="oso-sail">SAIL I+</span>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><i class="ti ti-history"></i> Version history</div></div>
+            <div class="sfoc-row">
+              <div><div class="sfoc-name">Version 2 &mdash; current</div><div class="sfoc-meta">Updated 8 months ago &middot; Linked to SFOC-2024-VPD-003</div></div>
+              <span class="tag tag-warn">Review due</span>
+            </div>
+            <div class="sfoc-row">
+              <div><div class="sfoc-name">Version 1 &mdash; initial submission</div><div class="sfoc-meta">Created 14 months ago &middot; Original SFOC application</div></div>
+              <span class="tag tag-grey">Superseded</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLACEHOLDER PAGES -->
+    <div class="page" id="page-missions"><div class="placeholder"><i class="ti ti-plane"></i><p>Flights &amp; missions</p></div></div>
+    <div class="page" id="page-planning"><div class="placeholder"><i class="ti ti-map"></i><p>Planning</p></div></div>
+    <div class="page" id="page-members"><div class="placeholder"><i class="ti ti-users"></i><p>Members &amp; teams</p></div></div>
+    <div class="page" id="page-maintenance"><div class="placeholder"><i class="ti ti-tool"></i><p>Maintenance</p></div></div>
+    <div class="page" id="page-reporting"><div class="placeholder"><i class="ti ti-chart-bar"></i><p>Reporting</p></div></div>
+    <div class="page" id="page-resources"><div class="placeholder"><i class="ti ti-books"></i><p>Resources</p></div></div>
+    <div class="page" id="page-settings"><div class="placeholder"><i class="ti ti-settings"></i><p>Settings</p></div></div>
+  </div>
+</div>
+
+<script>
+const titles = { dashboard:'Dashboard', cert:'Certification', hardware:'Hardware', safety:'Safety', missions:'Flights & missions', planning:'Planning', members:'Members & teams', maintenance:'Maintenance', reporting:'Reporting', resources:'Resources', settings:'Settings' };
+const subs = { dashboard:'Overview', cert:'Certificates & endorsements', hardware:'Aircraft fleet', safety:'SORA 2.5 module', missions:'Flight log', planning:'Airspace planning', members:'Pilots & staff', maintenance:'Maintenance log', reporting:'Compliance reports', resources:'Documents & links', settings:'Account settings' };
+function nav(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+  document.getElementById('page-title').textContent = titles[id] || id;
+  document.getElementById('breadcrumb-sub').textContent = subs[id] || '';
+}
+</script>
+</body>
+</html>
