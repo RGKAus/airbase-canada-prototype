@@ -27,9 +27,9 @@ body{padding:24px 20px}
 .agency-row{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:stretch}
 .agency-name{font-size:22px;font-weight:700;color:#f9fafb;line-height:1.15;margin-bottom:8px}
 .agency-meta{font-size:12px;color:#6b7280;line-height:1.5}
-.status-box{background:#052e22;border:0.5px solid #065f46;border-radius:8px;padding:12px 14px;min-width:170px}
+.status-box{background:#332d0b;border:0.5px solid #eab308;border-radius:8px;padding:12px 14px;min-width:190px}
 .status-label{font-size:10px;color:#6b7280;text-transform:uppercase;margin-bottom:5px}
-.status-value{font-size:15px;font-weight:750;color:#34d399;display:flex;align-items:center;gap:6px}
+.status-value{font-size:15px;font-weight:750;color:#fef3c7;display:flex;align-items:center;gap:6px}
 .issue-box{background:#332d0b;border:0.5px solid #eab308;border-radius:8px;padding:12px 14px;min-width:145px}
 .issue-num{font-size:24px;font-weight:800;color:#fef3c7;line-height:1}
 .issue-text{font-size:10px;color:#fef3c7;margin-top:5px;line-height:1.35}
@@ -45,15 +45,20 @@ body{padding:24px 20px}
 .action-top{font-size:11px;color:#6b7280;text-transform:uppercase;display:flex;align-items:center;gap:6px}
 .action-title{font-size:13px;font-weight:700;color:#e2e4e9;line-height:1.35;margin-top:10px}
 .dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.health-card{background:#161b27;border:0.5px solid #2a3045;border-radius:10px;padding:15px;display:flex;flex-direction:column;min-height:270px}
-.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
-.card-title{font-size:14px;font-weight:700;color:#f3f4f6;display:flex;align-items:center;gap:7px}
-.card-title i{font-size:18px;color:#93c5fd}
+.health-card{background:#161b27;border:0.5px solid #2a3045;border-radius:10px;padding:15px;display:flex;flex-direction:column;min-height:160px;cursor:pointer;transition:border-color .15s,background .15s,transform .15s}
+.health-card:hover,.health-card:focus{border-color:#3b82f6;background:#0c1e35;transform:translateY(-1px);outline:none}
+.health-card.active{border-color:#3b82f6;background:#0c1e35}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.card-title{font-size:15px;font-weight:750;color:#f3f4f6;display:flex;align-items:center;gap:7px}
+.card-title i{font-size:19px;color:#93c5fd}
 .health-pill{font-size:9px;border-radius:999px;padding:3px 7px;border:0.5px solid #2a3045;white-space:nowrap}
 .health-pill.healthy{border-color:#065f46;color:#34d399;background:#052e22}
 .health-pill.attention{border-color:#eab308;color:#fef3c7;background:#332d0b}
 .health-pill.critical{border-color:#f9a8d4;color:#fbcfe8;background:#351625}
-.metrics{display:grid;gap:7px;margin-bottom:13px}
+.card-hint{font-size:11px;color:#6b7280;margin-top:auto}
+.card-preview{opacity:0;max-height:0;overflow:hidden;transition:opacity .15s,max-height .2s;margin-top:10px}
+.health-card:hover .card-preview,.health-card:focus .card-preview{opacity:1;max-height:210px}
+.metrics{display:grid;gap:7px;margin-bottom:11px}
 .metric{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:0.5px solid #1f2937}
 .metric:last-child{border-bottom:none}
 .metric-label{font-size:11px;color:#9ca3af;line-height:1.35}
@@ -63,6 +68,14 @@ body{padding:24px 20px}
 .card-footer{margin-top:12px;display:flex;justify-content:flex-end}
 .btn-detail{background:#1e3a5f;color:#93c5fd;border:0.5px solid #2a5080;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
 .btn-detail:hover{background:#1e4a7f}
+.detail-panel{margin-top:16px}
+.detail-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
+.detail-title{font-size:16px;font-weight:750;color:#f9fafb;display:flex;align-items:center;gap:8px}
+.detail-title i{color:#93c5fd}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.detail-block{background:#0f1117;border:0.5px solid #2a3045;border-radius:8px;padding:12px}
+.detail-label{font-size:10px;color:#6b7280;text-transform:uppercase;margin-bottom:7px}
+.detail-text{font-size:12px;color:#d1d5db;line-height:1.55}
 .muted{color:#6b7280}
 @media(max-width:1040px){
   .dash-grid{grid-template-columns:repeat(2,1fr)}
@@ -72,7 +85,7 @@ body{padding:24px 20px}
 @media(max-width:720px){
   body{padding:16px 12px}
   .agency-row{grid-template-columns:1fr}
-  .dash-grid,.action-centre{grid-template-columns:1fr}
+  .dash-grid,.action-centre,.detail-grid{grid-template-columns:1fr}
   .nav-row{width:100%}
   .btn-primary,.btn-action{width:100%;justify-content:center}
 }
@@ -104,12 +117,12 @@ body{padding:24px 20px}
         </div>
         <div class="status-box">
           <div class="status-label">Overall program status</div>
-          <div class="status-value"><i class="ti ti-circle-check" aria-hidden="true"></i> Healthy</div>
+          <div class="status-value"><i class="ti ti-alert-triangle" aria-hidden="true"></i> Attention Required</div>
         </div>
         <div class="issue-box">
           <div class="status-label">Issues requiring attention</div>
-          <div class="issue-num">4</div>
-          <div class="issue-text">Items need manager review</div>
+          <div class="issue-num">6</div>
+          <div class="issue-text">Module issues need manager review</div>
         </div>
       </div>
     </section>
@@ -131,102 +144,161 @@ body{padding:24px 20px}
     <div class="action-tile critical"><div class="action-top"><i class="ti ti-chart-bar" aria-hidden="true"></i> Action centre</div><div class="action-title">BVLOS SORA incomplete</div></div>
   </section>
 
-  <main class="dash-grid">
-    <article class="health-card">
+  <main class="dash-grid" id="dashboard-grid">
+    <article class="health-card active" tabindex="0" onclick="selectModule('Personnel')" onkeydown="cardKey(event,'Personnel')">
       <div class="card-head"><div class="card-title"><i class="ti ti-users" aria-hidden="true"></i> Personnel</div><span class="health-pill attention">Attention Required</span></div>
-      <div class="metrics">
-        <div class="metric"><span class="metric-label">Pilots</span><span class="metric-value">6</span></div>
-        <div class="metric"><span class="metric-label">Current</span><span class="metric-value">5</span></div>
-        <div class="metric"><span class="metric-label">Expiring within 30 days</span><span class="metric-value">1</span></div>
-        <div class="metric"><span class="metric-label">Expired</span><span class="metric-value">0</span></div>
-      </div>
-      <div class="card-action"><strong>Action required</strong> Review upcoming pilot currency expiry.</div>
-      <div class="card-footer"><button class="btn-detail" onclick="showModule('Personnel')">View Details <i class="ti ti-arrow-right" aria-hidden="true"></i></button></div>
+      <div class="card-hint">Hover for summary · Click for details</div>
+      <div class="card-preview"><div class="metrics"><div class="metric"><span class="metric-label">Pilots</span><span class="metric-value">6</span></div><div class="metric"><span class="metric-label">Current</span><span class="metric-value">5</span></div><div class="metric"><span class="metric-label">Expiring within 30 days</span><span class="metric-value">1</span></div><div class="metric"><span class="metric-label">Expired</span><span class="metric-value">0</span></div></div><div class="card-action"><strong>Action required</strong> Review upcoming pilot currency expiry.</div></div>
     </article>
 
-    <article class="health-card">
+    <article class="health-card" tabindex="0" onclick="selectModule('Fleet')" onkeydown="cardKey(event,'Fleet')">
       <div class="card-head"><div class="card-title"><i class="ti ti-plane-tilt" aria-hidden="true"></i> Fleet</div><span class="health-pill attention">Attention Required</span></div>
-      <div class="metrics">
-        <div class="metric"><span class="metric-label">Aircraft</span><span class="metric-value">4</span></div>
-        <div class="metric"><span class="metric-label">Operational</span><span class="metric-value">3</span></div>
-        <div class="metric"><span class="metric-label">Grounded</span><span class="metric-value">1</span></div>
-        <div class="metric"><span class="metric-label">Maintenance due</span><span class="metric-value">1</span></div>
-      </div>
-      <div class="card-action"><strong>Action required</strong> Confirm MH-03 inspection booking.</div>
-      <div class="card-footer"><button class="btn-detail" onclick="showModule('Fleet')">View Details <i class="ti ti-arrow-right" aria-hidden="true"></i></button></div>
+      <div class="card-hint">Hover for summary · Click for details</div>
+      <div class="card-preview"><div class="metrics"><div class="metric"><span class="metric-label">Aircraft</span><span class="metric-value">4</span></div><div class="metric"><span class="metric-label">Operational</span><span class="metric-value">3</span></div><div class="metric"><span class="metric-label">Grounded</span><span class="metric-value">1</span></div><div class="metric"><span class="metric-label">Maintenance due</span><span class="metric-value">1</span></div></div><div class="card-action"><strong>Action required</strong> Confirm MH-03 inspection booking.</div></div>
     </article>
 
-    <article class="health-card">
+    <article class="health-card" tabindex="0" onclick="selectModule('Maintenance')" onkeydown="cardKey(event,'Maintenance')">
       <div class="card-head"><div class="card-title"><i class="ti ti-tool" aria-hidden="true"></i> Maintenance</div><span class="health-pill attention">Attention Required</span></div>
-      <div class="metrics">
-        <div class="metric"><span class="metric-label">Open defects</span><span class="metric-value">1</span></div>
-        <div class="metric"><span class="metric-label">Inspections due</span><span class="metric-value">2</span></div>
-        <div class="metric"><span class="metric-label">Overdue inspections</span><span class="metric-value">0</span></div>
-      </div>
-      <div class="card-action"><strong>Action required</strong> Assign inspection owner for upcoming checks.</div>
-      <div class="card-footer"><button class="btn-detail" onclick="showModule('Maintenance')">View Details <i class="ti ti-arrow-right" aria-hidden="true"></i></button></div>
+      <div class="card-hint">Hover for summary · Click for details</div>
+      <div class="card-preview"><div class="metrics"><div class="metric"><span class="metric-label">Open defects</span><span class="metric-value">1</span></div><div class="metric"><span class="metric-label">Inspections due</span><span class="metric-value">2</span></div><div class="metric"><span class="metric-label">Overdue inspections</span><span class="metric-value">0</span></div></div><div class="card-action"><strong>Action required</strong> Assign inspection owner for upcoming checks.</div></div>
     </article>
 
-    <article class="health-card">
+    <article class="health-card" tabindex="0" onclick="selectModule('Documentation')" onkeydown="cardKey(event,'Documentation')">
       <div class="card-head"><div class="card-title"><i class="ti ti-folders" aria-hidden="true"></i> Documentation</div><span class="health-pill attention">Attention Required</span></div>
-      <div class="metrics">
-        <div class="metric"><span class="metric-label">Current documents</span><span class="metric-value">12</span></div>
-        <div class="metric"><span class="metric-label">Expiring soon</span><span class="metric-value">2</span></div>
-        <div class="metric"><span class="metric-label">Missing</span><span class="metric-value">1</span></div>
-      </div>
-      <div class="card-action"><strong>Action required</strong> Update ERP and upload missing checklist.</div>
-      <div class="card-footer"><button class="btn-detail" onclick="showModule('Documents')">View Details <i class="ti ti-arrow-right" aria-hidden="true"></i></button></div>
+      <div class="card-hint">Hover for summary · Click for details</div>
+      <div class="card-preview"><div class="metrics"><div class="metric"><span class="metric-label">Current documents</span><span class="metric-value">12</span></div><div class="metric"><span class="metric-label">Expiring soon</span><span class="metric-value">2</span></div><div class="metric"><span class="metric-label">Missing</span><span class="metric-value">1</span></div></div><div class="card-action"><strong>Action required</strong> Update ERP and upload missing checklist.</div></div>
     </article>
 
-    <article class="health-card">
+    <article class="health-card" tabindex="0" onclick="selectModule('Regulatory & Approvals')" onkeydown="cardKey(event,'Regulatory & Approvals')">
       <div class="card-head"><div class="card-title"><i class="ti ti-certificate" aria-hidden="true"></i> Regulatory &amp; Approvals</div><span class="health-pill attention">Attention Required</span></div>
-      <div class="metrics">
-        <div class="metric"><span class="metric-label">Active SFOCs</span><span class="metric-value">2</span></div>
-        <div class="metric"><span class="metric-label">Expiring within 90 days</span><span class="metric-value">1</span></div>
-        <div class="metric"><span class="metric-label">RPOC</span><span class="metric-value">Current</span></div>
-      </div>
-      <div class="card-action"><strong>Action required</strong> Start renewal planning for expiring SFOC.</div>
-      <div class="card-footer"><button class="btn-detail" onclick="showModule('Regulatory & Approvals')">View Details <i class="ti ti-arrow-right" aria-hidden="true"></i></button></div>
+      <div class="card-hint">Hover for summary · Click for details</div>
+      <div class="card-preview"><div class="metrics"><div class="metric"><span class="metric-label">Active SFOCs</span><span class="metric-value">2</span></div><div class="metric"><span class="metric-label">Expiring within 90 days</span><span class="metric-value">1</span></div><div class="metric"><span class="metric-label">RPOC</span><span class="metric-value">Current</span></div></div><div class="card-action"><strong>Action required</strong> Start renewal planning for expiring SFOC.</div></div>
     </article>
 
-    <article class="health-card">
+    <article class="health-card" tabindex="0" onclick="selectModule('Operations')" onkeydown="cardKey(event,'Operations')">
       <div class="card-head"><div class="card-title"><i class="ti ti-map-2" aria-hidden="true"></i> Operations</div><span class="health-pill healthy">Healthy</span></div>
-      <div class="metrics">
-        <div class="metric"><span class="metric-label">Missions this month</span><span class="metric-value">48</span></div>
-        <div class="metric"><span class="metric-label">Flight hours this month</span><span class="metric-value">82</span></div>
-        <div class="metric"><span class="metric-label">Safety events</span><span class="metric-value">0</span></div>
-      </div>
-      <div class="card-action"><strong>Action required</strong> No urgent action. Continue monthly reporting.</div>
-      <div class="card-footer"><button class="btn-detail" onclick="showModule('Operations')">View Details <i class="ti ti-arrow-right" aria-hidden="true"></i></button></div>
+      <div class="card-hint">Hover for summary · Click for details</div>
+      <div class="card-preview"><div class="metrics"><div class="metric"><span class="metric-label">Missions this month</span><span class="metric-value">48</span></div><div class="metric"><span class="metric-label">Flight hours this month</span><span class="metric-value">82</span></div><div class="metric"><span class="metric-label">Safety events</span><span class="metric-value">0</span></div></div><div class="card-action"><strong>Action required</strong> No urgent action. Continue monthly reporting.</div></div>
     </article>
 
-    <article class="health-card">
+    <article class="health-card" tabindex="0" onclick="selectModule('Capability')" onkeydown="cardKey(event,'Capability')">
       <div class="card-head"><div class="card-title"><i class="ti ti-trending-up" aria-hidden="true"></i> Capability</div><span class="health-pill critical">Critical</span></div>
-      <div class="metrics">
-        <div class="metric"><span class="metric-label">Current</span><span class="metric-value">VLOS, Search &amp; Rescue, Tactical Support</span></div>
-        <div class="metric"><span class="metric-label">In development</span><span class="metric-value">DFR, BVLOS, Dock Operations</span></div>
-      </div>
-      <div class="card-action"><strong>Action required</strong> Complete BVLOS SORA before capability expansion.</div>
-      <div class="card-footer"><button class="btn-detail" onclick="showModule('Capability')">View Details <i class="ti ti-arrow-right" aria-hidden="true"></i></button></div>
+      <div class="card-hint">Hover for summary · Click for details</div>
+      <div class="card-preview"><div class="metrics"><div class="metric"><span class="metric-label">Current</span><span class="metric-value">VLOS, Search &amp; Rescue, Tactical Support</span></div><div class="metric"><span class="metric-label">In development</span><span class="metric-value">DFR, BVLOS, Dock Operations</span></div></div><div class="card-action"><strong>Action required</strong> Complete BVLOS SORA before capability expansion.</div></div>
     </article>
 
-    <article class="health-card">
+    <article class="health-card" tabindex="0" onclick="selectModule('Safety')" onkeydown="cardKey(event,'Safety')">
       <div class="card-head"><div class="card-title"><i class="ti ti-shield-check" aria-hidden="true"></i> Safety</div><span class="health-pill healthy">Healthy</span></div>
-      <div class="metrics">
-        <div class="metric"><span class="metric-label">Open hazards</span><span class="metric-value">2</span></div>
-        <div class="metric"><span class="metric-label">Incidents</span><span class="metric-value">0</span></div>
-        <div class="metric"><span class="metric-label">Last safety review</span><span class="metric-value">18 days ago</span></div>
-      </div>
-      <div class="card-action"><strong>Action required</strong> Review two open hazards at next safety meeting.</div>
-      <div class="card-footer"><button class="btn-detail" onclick="showModule('Safety')">View Details <i class="ti ti-arrow-right" aria-hidden="true"></i></button></div>
+      <div class="card-hint">Hover for summary · Click for details</div>
+      <div class="card-preview"><div class="metrics"><div class="metric"><span class="metric-label">Open hazards</span><span class="metric-value">2</span></div><div class="metric"><span class="metric-label">Incidents</span><span class="metric-value">0</span></div><div class="metric"><span class="metric-label">Last safety review</span><span class="metric-value">18 days ago</span></div></div><div class="card-action"><strong>Action required</strong> Review two open hazards at next safety meeting.</div></div>
     </article>
   </main>
+
+  <section class="panel detail-panel" id="module-detail" aria-live="polite"></section>
 </div>
 
 <script>
-function showModule(name){
-  alert(name + ' module selected. This prototype uses placeholder data; detailed module screens would connect here.');
+const MODULE_DETAILS={
+  'Personnel':{
+    icon:'ti-users',status:'Attention Required',cls:'attention',
+    summary:'One pilot currency record expires in 14 days. No personnel records are expired.',
+    metrics:[['Pilots','6'],['Current','5'],['Expiring within 30 days','1'],['Expired','0']],
+    action:'Review upcoming pilot currency expiry and confirm recurrent training date.'
+  },
+  'Fleet':{
+    icon:'ti-plane-tilt',status:'Attention Required',cls:'attention',
+    summary:'One aircraft is grounded and one maintenance item is due before operational use.',
+    metrics:[['Aircraft','4'],['Operational','3'],['Grounded','1'],['Maintenance due','1']],
+    action:'Confirm MH-03 inspection booking and return-to-service pathway.'
+  },
+  'Maintenance':{
+    icon:'ti-tool',status:'Attention Required',cls:'attention',
+    summary:'Upcoming inspections need ownership assigned. No inspections are overdue.',
+    metrics:[['Open defects','1'],['Inspections due','2'],['Overdue inspections','0']],
+    action:'Assign inspection owner and update maintenance tracking records.'
+  },
+  'Documentation':{
+    icon:'ti-folders',status:'Attention Required',cls:'attention',
+    summary:'Two documents are nearing review date and one required checklist is missing.',
+    metrics:[['Current documents','12'],['Expiring soon','2'],['Missing','1']],
+    action:'Update ERP, confirm document owner, and upload missing checklist.'
+  },
+  'Regulatory & Approvals':{
+    icon:'ti-certificate',status:'Attention Required',cls:'attention',
+    summary:'One SFOC is within the 90-day renewal planning window. RPOC is current.',
+    metrics:[['Active SFOCs','2'],['Expiring within 90 days','1'],['RPOC','Current']],
+    action:'Start renewal planning and confirm whether an amendment is required.'
+  },
+  'Operations':{
+    icon:'ti-map-2',status:'Healthy',cls:'healthy',
+    summary:'Operational tempo is active with no safety events recorded this month.',
+    metrics:[['Missions this month','48'],['Flight hours this month','82'],['Safety events','0']],
+    action:'Continue monthly reporting and operational trend review.'
+  },
+  'Capability':{
+    icon:'ti-trending-up',status:'Critical',cls:'critical',
+    summary:'DFR, BVLOS, and dock operations remain blocked until BVLOS SORA work is completed.',
+    metrics:[['Current','VLOS, Search & Rescue, Tactical Support'],['In development','DFR, BVLOS, Dock Operations']],
+    action:'Complete BVLOS SORA before capability expansion proceeds.'
+  },
+  'Safety':{
+    icon:'ti-shield-check',status:'Healthy',cls:'healthy',
+    summary:'No incidents are recorded. Two hazards remain open for safety review.',
+    metrics:[['Open hazards','2'],['Incidents','0'],['Last safety review','18 days ago']],
+    action:'Review open hazards at the next safety meeting.'
+  },
+  'Capability Expansion':{
+    icon:'ti-trending-up',status:'Critical',cls:'critical',
+    summary:'Capability expansion is dependent on completing BVLOS SORA and supporting evidence.',
+    metrics:[['Expansion candidates','DFR, BVLOS, Dock Operations'],['Blocking item','BVLOS SORA incomplete']],
+    action:'Open the Capability module and assign the SORA owner.'
+  }
+};
+
+function renderDetail(name){
+  const detail=MODULE_DETAILS[name]||MODULE_DETAILS.Personnel;
+  return `
+    <div class="detail-top">
+      <div>
+        <div class="detail-title"><i class="ti ${detail.icon}" aria-hidden="true"></i> ${name}</div>
+        <div class="agency-meta">${detail.summary}</div>
+      </div>
+      <span class="health-pill ${detail.cls}">${detail.status}</span>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-block">
+        <div class="detail-label">Key metrics</div>
+        <div class="metrics">${detail.metrics.map(m=>`<div class="metric"><span class="metric-label">${m[0]}</span><span class="metric-value">${m[1]}</span></div>`).join('')}</div>
+      </div>
+      <div class="detail-block">
+        <div class="detail-label">Action required</div>
+        <div class="detail-text">${detail.action}</div>
+      </div>
+    </div>`;
 }
+
+function selectModule(name){
+  document.querySelectorAll('.health-card').forEach(card=>card.classList.remove('active'));
+  const cards=[...document.querySelectorAll('.health-card')];
+  const selected=cards.find(card=>card.textContent.includes(name.replace('Regulatory & Approvals','Regulatory')));
+  if(selected)selected.classList.add('active');
+  const detail=document.getElementById('module-detail');
+  if(detail)detail.innerHTML=renderDetail(name);
+}
+
+function cardKey(event,name){
+  if(event.key==='Enter'||event.key===' '){
+    event.preventDefault();
+    selectModule(name);
+  }
+}
+
+function showModule(name){
+  selectModule(name==='Documents'?'Documentation':name);
+  document.getElementById('module-detail')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+selectModule('Personnel');
 </script>
 </body>
 </html>
