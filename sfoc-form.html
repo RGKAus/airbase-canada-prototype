@@ -112,6 +112,19 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
 .builder-notice{font-size:11px;color:#6b7280;margin-top:10px;min-height:16px}
 .btn-builder-primary{background:#1d4ed8;color:#fff;border:0;border-radius:7px;padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:inherit}
 .btn-builder-primary:hover{background:#1e40af}
+.status-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.status-tile{background:#0f1117;border:0.5px solid #2a3045;border-radius:7px;padding:10px 11px;min-height:70px;display:flex;flex-direction:column;justify-content:space-between}
+.status-icon{font-size:17px;color:#4b5563;margin-bottom:8px}
+.status-tile.active{background:#0c1e35;border-color:#1e3a5f}
+.status-tile.active .status-icon,.status-tile.active .status-value{color:#93c5fd}
+.status-tile.warn{background:#1c1008;border-color:#92400e}
+.status-tile.warn .status-icon,.status-tile.warn .status-value{color:#fbbf24}
+.status-value{font-size:12px;font-weight:700;color:#e2e4e9;line-height:1.3}
+.status-caption{font-size:10px;color:#6b7280;margin-top:3px}
+.mini-road{display:flex;align-items:center;gap:5px;margin-top:12px}
+.mini-node{height:6px;flex:1;border-radius:999px;background:#1f2937;border:0.5px solid #2a3045}
+.mini-node.done{background:#1e3a5f;border-color:#2a5080}
+.mini-node.now{background:#3b82f6;border-color:#60a5fa}
 
 /* OFFICIAL FORM STYLES */
 .tc-form{background:#ffffff;border-radius:8px;padding:0;font-family:'Arial',sans-serif;font-size:11px;color:#000;width:100%;line-height:1.4}
@@ -224,7 +237,6 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
         <div class="score-ring"><div class="score-value"><div class="score-num">34%</div><div class="score-label">Ready</div></div></div>
         <div>
           <div style="font-size:15px;font-weight:600;color:#e2e4e9;margin-bottom:6px">Medicine Hat Police Service</div>
-          <div style="font-size:12px;color:#9ca3af;line-height:1.6">Early-stage RPAS unit buildout focused on governance approval, operational use cases, DaaS operating model, and a staged path toward SFOC-ready documentation.</div>
           <div class="metric-row">
             <div class="metric-box"><div class="metric-label">Current stage</div><div class="metric-value">Governance &amp; Approval</div></div>
             <div class="metric-box"><div class="metric-label">Program status</div><div class="metric-value" style="color:#fbbf24">In setup</div></div>
@@ -246,7 +258,15 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
 
   <div class="panel">
     <div class="panel-title"><i class="ti ti-report-analytics" aria-hidden="true"></i> Program status summary</div>
-    <div class="info-box" style="margin-bottom:0"><i class="ti ti-info-circle"></i><div>Medicine Hat Police Service is at the program-initiation stage. Governance, use-case definition, DaaS model selection, and document control should be completed before aircraft procurement, SORA assessment, and SFOC package assembly.</div></div>
+    <div class="status-strip">
+      <div class="status-tile active"><div><i class="ti ti-shield-check status-icon" aria-hidden="true"></i><div class="status-value">Governance</div></div><div class="status-caption">Active</div></div>
+      <div class="status-tile active"><div><i class="ti ti-target-arrow status-icon" aria-hidden="true"></i><div class="status-value">Use cases</div></div><div class="status-caption">Drafting</div></div>
+      <div class="status-tile warn"><div><i class="ti ti-building-cog status-icon" aria-hidden="true"></i><div class="status-value">DaaS model</div></div><div class="status-caption">Decision needed</div></div>
+      <div class="status-tile"><div><i class="ti ti-file-certificate status-icon" aria-hidden="true"></i><div class="status-value">SFOC package</div></div><div class="status-caption">Not started</div></div>
+    </div>
+    <div class="mini-road" aria-hidden="true">
+      <div class="mini-node done"></div><div class="mini-node now"></div><div class="mini-node"></div><div class="mini-node"></div><div class="mini-node"></div><div class="mini-node"></div>
+    </div>
   </div>
 
   <div class="stage-layout">
