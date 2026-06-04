@@ -99,9 +99,10 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
 .stage-btn.active .stage-index{background:#1e3a5f;color:#93c5fd}
 .stage-name{font-size:12px;font-weight:600;line-height:1.35}
 .stage-pill{font-size:9px;border-radius:999px;padding:2px 6px;border:0.5px solid #2a3045;color:#6b7280;white-space:nowrap}
-.pill-progress{border-color:#1e3a5f;color:#93c5fd;background:#0c1e35}
-.pill-pending{border-color:#374151;color:#9ca3af;background:#1f2937}
-.pill-blocked{border-color:#92400e;color:#fbbf24;background:#1c1008}
+.pill-complete{border-color:#065f46;color:#34d399;background:#052e22}
+.pill-drafting{border-color:#eab308;color:#fef3c7;background:#332d0b}
+.pill-decision{border-color:#f9a8d4;color:#fbcfe8;background:#351625}
+.pill-locked{border-color:#374151;color:#9ca3af;background:#111827}
 .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .detail-block{background:#0f1117;border:0.5px solid #2a3045;border-radius:7px;padding:11px 12px}
 .detail-block.full{grid-column:1/-1}
@@ -115,16 +116,20 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
 .status-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .status-tile{background:#0f1117;border:0.5px solid #2a3045;border-radius:7px;padding:10px 11px;min-height:70px;display:flex;flex-direction:column;justify-content:space-between}
 .status-icon{font-size:17px;color:#4b5563;margin-bottom:8px}
-.status-tile.active{background:#0c1e35;border-color:#1e3a5f}
-.status-tile.active .status-icon,.status-tile.active .status-value{color:#93c5fd}
-.status-tile.warn{background:#1c1008;border-color:#92400e}
-.status-tile.warn .status-icon,.status-tile.warn .status-value{color:#fbbf24}
+.status-tile.complete{background:#052e22;border-color:#065f46}
+.status-tile.complete .status-icon,.status-tile.complete .status-value{color:#34d399}
+.status-tile.drafting{background:#332d0b;border-color:#eab308}
+.status-tile.drafting .status-icon,.status-tile.drafting .status-value{color:#fef3c7}
+.status-tile.decision{background:#351625;border-color:#f9a8d4}
+.status-tile.decision .status-icon,.status-tile.decision .status-value{color:#fbcfe8}
+.status-tile.locked{background:#111827;border-color:#374151}
+.status-tile.locked .status-icon,.status-tile.locked .status-value{color:#9ca3af}
 .status-value{font-size:12px;font-weight:700;color:#e2e4e9;line-height:1.3}
 .status-caption{font-size:10px;color:#6b7280;margin-top:3px}
 .mini-road{display:flex;align-items:center;gap:5px;margin-top:12px}
 .mini-node{height:6px;flex:1;border-radius:999px;background:#1f2937;border:0.5px solid #2a3045}
-.mini-node.done{background:#1e3a5f;border-color:#2a5080}
-.mini-node.now{background:#3b82f6;border-color:#60a5fa}
+.mini-node.done{background:#065f46;border-color:#10b981}
+.mini-node.now{background:#facc15;border-color:#fde68a}
 
 /* OFFICIAL FORM STYLES */
 .tc-form{background:#ffffff;border-radius:8px;padding:0;font-family:'Arial',sans-serif;font-size:11px;color:#000;width:100%;line-height:1.4}
@@ -259,10 +264,10 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
   <div class="panel">
     <div class="panel-title"><i class="ti ti-report-analytics" aria-hidden="true"></i> Program status summary</div>
     <div class="status-strip">
-      <div class="status-tile active"><div><i class="ti ti-shield-check status-icon" aria-hidden="true"></i><div class="status-value">Governance</div></div><div class="status-caption">Active</div></div>
-      <div class="status-tile active"><div><i class="ti ti-target-arrow status-icon" aria-hidden="true"></i><div class="status-value">Use cases</div></div><div class="status-caption">Drafting</div></div>
-      <div class="status-tile warn"><div><i class="ti ti-building-cog status-icon" aria-hidden="true"></i><div class="status-value">DaaS model</div></div><div class="status-caption">Decision needed</div></div>
-      <div class="status-tile"><div><i class="ti ti-file-certificate status-icon" aria-hidden="true"></i><div class="status-value">SFOC package</div></div><div class="status-caption">Not started</div></div>
+      <div class="status-tile complete"><div><i class="ti ti-shield-check status-icon" aria-hidden="true"></i><div class="status-value">Governance</div></div><div class="status-caption">Complete</div></div>
+      <div class="status-tile drafting"><div><i class="ti ti-target-arrow status-icon" aria-hidden="true"></i><div class="status-value">Use cases</div></div><div class="status-caption">Drafting</div></div>
+      <div class="status-tile decision"><div><i class="ti ti-building-cog status-icon" aria-hidden="true"></i><div class="status-value">Hardware</div></div><div class="status-caption">Decision needed</div></div>
+      <div class="status-tile locked"><div><i class="ti ti-file-certificate status-icon" aria-hidden="true"></i><div class="status-value">SFOC package</div></div><div class="status-caption">Not ready</div></div>
     </div>
     <div class="mini-road" aria-hidden="true">
       <div class="mini-node done"></div><div class="mini-node now"></div><div class="mini-node"></div><div class="mini-node"></div><div class="mini-node"></div><div class="mini-node"></div>
@@ -577,22 +582,22 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
 
 <script>
 const PROGRAM_STAGES=[
-  {name:'Governance & Approval',status:'In progress',owner:'Chief / Deputy Chief',objective:'Establish authority, accountability, budget path, policy constraints, and command-level approval for the MHPS RPAS program.',tasks:['Confirm executive sponsor and program lead','Prepare command briefing and approval memo','Define governance board, privacy review, legal review, and records oversight'],docs:['Executive approval memo','Program charter','Privacy and legal review checklist'],next:'Schedule command briefing and confirm decision pathway.'},
-  {name:'Use Case Definition',status:'In progress',owner:'Operations Inspector',objective:'Define priority police use cases and the operational value each RPAS workflow is expected to support.',tasks:['Prioritize first 3-5 missions','Define success measures and dispatch triggers','Identify prohibited or restricted use cases'],docs:['Use case register','Mission trigger matrix','Community impact notes'],next:'Approve initial use-case list for patrol, SAR, collision, and tactical support.'},
-  {name:'DaaS Operating Model',status:'Blocked',owner:'Procurement / Program Lead',objective:'Choose whether MHPS will operate owned aircraft, vendor-supported DaaS, or a hybrid support model.',tasks:['Compare owned, DaaS, and hybrid costs','Define data custody and operational control','Confirm vendor support and service-level expectations'],docs:['Operating model decision brief','Procurement requirements','Data custody matrix'],next:'Select preferred operating model and procurement route.'},
-  {name:'Aircraft & Sensor Selection',status:'Pending',owner:'RPAS Program Lead',objective:'Match aircraft, dock, payload, and sensor capabilities to public safety use cases and Canadian compliance needs.',tasks:['Define aircraft requirements','Assess sensor, thermal, zoom, night, and weather capabilities','Map safety assurance declarations and limitations'],docs:['Aircraft requirements matrix','Payload selection note','Safety assurance evidence file'],next:'Create short list of aircraft and sensor configurations.'},
-  {name:'Personnel & Training',status:'Pending',owner:'Training Sergeant',objective:'Identify pilots, supervisors, observers, maintainers, and evidence users; assign training and currency requirements.',tasks:['Nominate pilot cohort and supervisors','Define certification pathway and recurrent training','Create currency and competency tracking process'],docs:['Training plan','Pilot roster','Currency log template'],next:'Nominate first pilot cohort and training dates.'},
-  {name:'Documentation Library',status:'Pending',owner:'Policy / RPAS Coordinator',objective:'Build the controlled document set needed for consistent, auditable RPAS operations.',tasks:['Create SOP and CONOPS structure','Set document owner and review cycle','Build forms for missions, incidents, maintenance, and evidence'],docs:['SOP','CONOPS','Mission log and incident report templates'],next:'Generate initial SOP and CONOPS templates.'},
-  {name:'Operational Areas & Airspace',status:'Pending',owner:'Operations / Airspace Lead',objective:'Define likely operating areas, launch sites, altitude limits, airspace constraints, and authorization pathways.',tasks:['Map routine operating areas','Identify controlled airspace and heliport constraints','Define site survey and NOTAM / NAV CANADA workflow'],docs:['Operational area register','Site survey template','Airspace authorization checklist'],next:'Map initial operating areas around Medicine Hat.'},
-  {name:'Detect & Avoid / Airspace Awareness',status:'Pending',owner:'Safety Officer',objective:'Define traffic awareness, detect-and-avoid mitigations, lost-link actions, and escalation procedures.',tasks:['Select ADS-B / traffic awareness tools','Document crew alerting and abort criteria','Define lost-link and emergency procedures'],docs:['DAA mitigation plan','Lost-link procedure','Airspace monitoring SOP'],next:'Draft the initial DAA mitigation plan.'},
-  {name:'Safety & Risk Management',status:'Pending',owner:'Safety Officer',objective:'Create a safety management approach for hazards, risk controls, occurrences, maintenance, and corrective action.',tasks:['Build hazard register','Define risk matrix and approval thresholds','Create occurrence reporting and review workflow'],docs:['Hazard register','Risk matrix','Occurrence report template'],next:'Create initial hazard register for priority missions.'},
-  {name:'SORA Assessment',status:'Pending',owner:'RPAS Program Lead / Safety Officer',objective:'Prepare draft SORA inputs and supporting evidence for the selected operating model and mission set.',tasks:['Confirm ground environment and ARC assumptions','Document mitigations and OSO evidence','Review draft GRC / SAIL estimate'],docs:['SORA workbook','OSO evidence checklist','Mitigation summary'],next:'Complete first SORA draft for the highest-priority use case.'},
-  {name:'SFOC Application Package',status:'Pending',owner:'RPAS Coordinator',objective:'Assemble the draft SFOC package and supporting documents for review before any official submission.',tasks:['Populate applicant and operation details','Attach CONOPS, SORA, SOP, training, and aircraft evidence','Run legal, privacy, and command review'],docs:['Draft SFOC application','Compliance checklist','Supporting document index'],next:'Open the SFOC Generator when SORA inputs are ready.'},
-  {name:'Validation Flights & Go-Live',status:'Pending',owner:'Operations Inspector',objective:'Validate procedures, training, communications, and evidence workflows before routine operational deployment.',tasks:['Run tabletop and validation flights','Capture lessons learned and corrective actions','Approve go-live criteria'],docs:['Validation flight plan','Readiness sign-off','Go-live checklist'],next:'Schedule tabletop exercise and validation flight window.'}
+  {name:'Governance & Approval',status:'Complete',owner:'Chief / Deputy Chief',objective:'Establish authority, accountability, budget path, policy constraints, and command-level approval for the MHPS RPAS program.',tasks:['Confirm executive sponsor and program lead','Prepare command briefing and approval memo','Define governance board, privacy review, legal review, and records oversight'],docs:['Executive approval memo','Program charter','Privacy and legal review checklist'],next:'Record approval decision and assign the program lead.'},
+  {name:'Use Case Definition',status:'Drafting',owner:'Operations Inspector',objective:'Define priority police use cases and the operational value each RPAS workflow is expected to support.',tasks:['Prioritize first 3-5 missions','Define success measures and dispatch triggers','Identify prohibited or restricted use cases'],docs:['Use case register','Mission trigger matrix','Community impact notes'],next:'Approve initial use-case list for patrol, SAR, collision, and tactical support.'},
+  {name:'Hardware Operating Model',status:'Decision needed',owner:'Procurement / Program Lead',objective:'Choose the aircraft, dock, sensor, support, maintenance, and data-handling approach MHPS intends to use.',tasks:['Compare agency-owned, vendor-supported, and hybrid hardware options','Define data custody and operational control','Confirm support and service-level expectations'],docs:['Hardware decision brief','Procurement requirements','Data custody matrix'],next:'Select preferred hardware approach and procurement route.'},
+  {name:'Aircraft & Sensor Selection',status:'Not ready',owner:'RPAS Program Lead',objective:'Match aircraft, dock, payload, and sensor capabilities to public safety use cases and Canadian compliance needs.',tasks:['Define aircraft requirements','Assess sensor, thermal, zoom, night, and weather capabilities','Map safety assurance declarations and limitations'],docs:['Aircraft requirements matrix','Payload selection note','Safety assurance evidence file'],next:'Confirm hardware approach before shortlisting aircraft and sensor configurations.'},
+  {name:'Personnel & Training',status:'Not ready',owner:'Training Sergeant',objective:'Identify pilots, supervisors, observers, maintainers, and evidence users; assign training and currency requirements.',tasks:['Nominate pilot cohort and supervisors','Define certification pathway and recurrent training','Create currency and competency tracking process'],docs:['Training plan','Pilot roster','Currency log template'],next:'Nominate first pilot cohort after priority use cases are approved.'},
+  {name:'Documentation Library',status:'Not ready',owner:'Policy / RPAS Coordinator',objective:'Build the controlled document set needed for consistent, auditable RPAS operations.',tasks:['Create SOP and CONOPS structure','Set document owner and review cycle','Build forms for missions, incidents, maintenance, and evidence'],docs:['SOP','CONOPS','Mission log and incident report templates'],next:'Generate initial SOP and CONOPS templates once use cases and hardware are confirmed.'},
+  {name:'Operational Areas & Airspace',status:'Not ready',owner:'Operations / Airspace Lead',objective:'Define likely operating areas, launch sites, altitude limits, airspace constraints, and authorization pathways.',tasks:['Map routine operating areas','Identify controlled airspace and heliport constraints','Define site survey and NOTAM / NAV CANADA workflow'],docs:['Operational area register','Site survey template','Airspace authorization checklist'],next:'Map initial operating areas around Medicine Hat after use cases are approved.'},
+  {name:'Detect & Avoid / Airspace Awareness',status:'Not ready',owner:'Safety Officer',objective:'Define traffic awareness, detect-and-avoid mitigations, lost-link actions, and escalation procedures.',tasks:['Select ADS-B / traffic awareness tools','Document crew alerting and abort criteria','Define lost-link and emergency procedures'],docs:['DAA mitigation plan','Lost-link procedure','Airspace monitoring SOP'],next:'Draft the initial DAA mitigation plan after operating areas are mapped.'},
+  {name:'Safety & Risk Management',status:'Not ready',owner:'Safety Officer',objective:'Create a safety management approach for hazards, risk controls, occurrences, maintenance, and corrective action.',tasks:['Build hazard register','Define risk matrix and approval thresholds','Create occurrence reporting and review workflow'],docs:['Hazard register','Risk matrix','Occurrence report template'],next:'Create initial hazard register for approved priority missions.'},
+  {name:'SORA Assessment',status:'Not ready',owner:'RPAS Program Lead / Safety Officer',objective:'Prepare draft SORA inputs and supporting evidence for the selected hardware approach and mission set.',tasks:['Confirm ground environment and ARC assumptions','Document mitigations and OSO evidence','Review draft GRC / SAIL estimate'],docs:['SORA workbook','OSO evidence checklist','Mitigation summary'],next:'Complete first SORA draft when mission, hardware, and area inputs are ready.'},
+  {name:'SFOC Application Package',status:'Not ready',owner:'RPAS Coordinator',objective:'Assemble the draft SFOC package and supporting documents for review before any official submission.',tasks:['Populate applicant and operation details','Attach CONOPS, SORA, SOP, training, and aircraft evidence','Run legal, privacy, and command review'],docs:['Draft SFOC application','Compliance checklist','Supporting document index'],next:'Open the SFOC Generator when SORA inputs are ready.'},
+  {name:'Validation Flights & Go-Live',status:'Not ready',owner:'Operations Inspector',objective:'Validate procedures, training, communications, and evidence workflows before routine operational deployment.',tasks:['Run tabletop and validation flights','Capture lessons learned and corrective actions','Approve go-live criteria'],docs:['Validation flight plan','Readiness sign-off','Go-live checklist'],next:'Schedule tabletop exercise and validation flight window after the draft package is reviewed.'}
 ];
 
 function stagePill(status){
-  const cls=status==='In progress'?'pill-progress':status==='Blocked'?'pill-blocked':'pill-pending';
+  const cls=status==='Complete'?'pill-complete':(status==='Drafting'||status==='Pending')?'pill-drafting':status==='Decision needed'?'pill-decision':'pill-locked';
   return `<span class="stage-pill ${cls}">${status}</span>`;
 }
 
