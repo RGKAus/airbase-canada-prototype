@@ -76,11 +76,14 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
 .draft-banner{background:#1c1008;border:0.5px solid #92400e;border-radius:7px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#d97706;display:flex;align-items:center;gap:8px;font-weight:500}
 .builder-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:14px;margin-bottom:16px}
 .builder-score{display:grid;grid-template-columns:120px 1fr;gap:18px;align-items:center}
-.score-ring{width:112px;height:112px;border-radius:50%;background:conic-gradient(#3b82f6 0 34%,#1f2937 34% 100%);display:flex;align-items:center;justify-content:center;position:relative;box-shadow:inset 0 0 0 1px #2a3045}
+.score-ring{width:112px;height:112px;border-radius:50%;background:conic-gradient(#3b82f6 0 var(--score,34%),#1f2937 var(--score,34%) 100%);display:flex;align-items:center;justify-content:center;position:relative;box-shadow:inset 0 0 0 1px #2a3045}
 .score-ring::after{content:'';position:absolute;width:78px;height:78px;border-radius:50%;background:#161b27;border:0.5px solid #2a3045}
 .score-value{position:relative;z-index:1;text-align:center}
 .score-num{font-size:24px;font-weight:700;color:#93c5fd;line-height:1}
 .score-label{font-size:9px;color:#6b7280;margin-top:4px;text-transform:uppercase}
+.mode-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.mode-btn{background:#0f1117;color:#9ca3af;border:0.5px solid #2a3045;border-radius:7px;padding:7px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px}
+.mode-btn.active,.mode-btn:hover{background:#0c1e35;border-color:#3b82f6;color:#93c5fd}
 .metric-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
 .metric-box{background:#0f1117;border:0.5px solid #2a3045;border-radius:7px;padding:10px}
 .metric-label{font-size:10px;color:#6b7280;margin-bottom:4px}
@@ -113,6 +116,16 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
 .builder-notice{font-size:11px;color:#6b7280;margin-top:10px;min-height:16px}
 .btn-builder-primary{background:#1d4ed8;color:#fff;border:0;border-radius:7px;padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:inherit}
 .btn-builder-primary:hover{background:#1e40af}
+.module-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px}
+.module-card{background:#0f1117;border:0.5px solid #2a3045;border-radius:7px;padding:11px;min-height:92px;display:flex;flex-direction:column;justify-content:space-between}
+.module-card:hover{border-color:#3b82f6;background:#0c1e35}
+.module-top{display:flex;align-items:center;gap:8px;color:#e2e4e9;font-size:12px;font-weight:700}
+.module-top i{font-size:17px;color:#93c5fd}
+.module-sub{font-size:10px;color:#6b7280;line-height:1.45;margin-top:7px}
+.module-status{font-size:9px;border-radius:999px;padding:2px 6px;border:0.5px solid #2a3045;color:#9ca3af;width:max-content;margin-top:10px}
+.module-status.live{border-color:#065f46;color:#34d399;background:#052e22}
+.module-status.ready{border-color:#1e3a5f;color:#93c5fd;background:#0c1e35}
+.module-status.planned{border-color:#eab308;color:#fef3c7;background:#332d0b}
 .status-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .status-tile{background:#0f1117;border:0.5px solid #2a3045;border-radius:7px;padding:10px 11px;min-height:70px;display:flex;flex-direction:column;justify-content:space-between}
 .status-icon{font-size:17px;color:#4b5563;margin-bottom:8px}
@@ -191,7 +204,7 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
   @page{size:A4;margin:15mm}
 }
 @media(max-width:780px){
-  .builder-grid,.stage-layout,.detail-grid{grid-template-columns:1fr}
+  .builder-grid,.stage-layout,.detail-grid,.module-grid{grid-template-columns:1fr}
   .builder-score{grid-template-columns:1fr}
   .score-ring{margin:0 auto}
   .metric-row{grid-template-columns:1fr}
@@ -229,10 +242,14 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
 <div id="program-builder">
   <div class="tool-header">
     <div>
-      <div class="tool-title"><i class="ti ti-building-fortress" aria-hidden="true"></i> AirBase RPAS Program Builder</div>
-      <div class="tool-sub">Guided readiness dashboard for Medicine Hat Police Service · Canadian public safety RPAS program planning</div>
+      <div class="tool-title"><i class="ti ti-building-fortress" aria-hidden="true"></i> AirBase RPAS Program Management Platform</div>
+      <div class="tool-sub">Program readiness, operational records, risk assessment, and SFOC package support for Canadian public safety RPAS teams</div>
     </div>
-    <button class="btn-builder-primary" onclick="openSFOCGenerator()"><i class="ti ti-file-certificate" style="font-size:14px" aria-hidden="true"></i> Open SFOC Generator</button>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <input id="program-import-file" type="file" accept=".json,.csv,.xlsx,.pdf,.doc,.docx" style="display:none" onchange="handleProgramImport(this)" />
+      <button class="btn-action" onclick="document.getElementById('program-import-file').click()"><i class="ti ti-upload" style="font-size:12px" aria-hidden="true"></i> Import Existing Program</button>
+      <button class="btn-builder-primary" onclick="openSFOCGenerator()"><i class="ti ti-file-certificate" style="font-size:14px" aria-hidden="true"></i> Open SFOC Generator</button>
+    </div>
   </div>
 
   <div class="builder-grid">
@@ -242,10 +259,14 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
         <div class="score-ring"><div class="score-value"><div class="score-num">34%</div><div class="score-label">Ready</div></div></div>
         <div>
           <div style="font-size:15px;font-weight:600;color:#e2e4e9;margin-bottom:6px">Medicine Hat Police Service</div>
+          <div class="mode-row" aria-label="Program mode">
+            <button class="mode-btn active" id="mode-new" onclick="setProgramMode('new')"><i class="ti ti-sparkles" aria-hidden="true"></i> New program</button>
+            <button class="mode-btn" id="mode-mature" onclick="setProgramMode('mature')"><i class="ti ti-shield-check" aria-hidden="true"></i> Mature program</button>
+          </div>
           <div class="metric-row">
-            <div class="metric-box"><div class="metric-label">Current stage</div><div class="metric-value">Governance &amp; Approval</div></div>
-            <div class="metric-box"><div class="metric-label">Program status</div><div class="metric-value" style="color:#fbbf24">In setup</div></div>
-            <div class="metric-box"><div class="metric-label">SFOC readiness</div><div class="metric-value" style="color:#93c5fd">Planned</div></div>
+            <div class="metric-box"><div class="metric-label">Current stage</div><div class="metric-value" id="metric-stage">Governance &amp; Approval</div></div>
+            <div class="metric-box"><div class="metric-label">Program status</div><div class="metric-value" id="metric-status" style="color:#fef3c7">In setup</div></div>
+            <div class="metric-box"><div class="metric-label">SFOC readiness</div><div class="metric-value" id="metric-sfoc" style="color:#93c5fd">Planned</div></div>
           </div>
         </div>
       </div>
@@ -253,11 +274,19 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
 
     <div class="panel">
       <div class="panel-title"><i class="ti ti-list-check" aria-hidden="true"></i> Top 3 next actions</div>
-      <div class="action-list">
-        <div class="action-item"><div class="action-num">1</div><div><div class="action-title">Confirm executive sponsor and governance path</div><div class="action-sub">Prepare command briefing, approval memo, and privacy / legal review route.</div></div></div>
-        <div class="action-item"><div class="action-num">2</div><div><div class="action-title">Define first operational use cases</div><div class="action-sub">Prioritize search, collision reconstruction, tactical perimeter, and missing-person response.</div></div></div>
-        <div class="action-item"><div class="action-num">3</div><div><div class="action-title">Start the documentation library</div><div class="action-sub">Build SOP, CONOPS, training, maintenance, incident, and evidence-handling templates.</div></div></div>
+      <div class="action-list" id="next-actions">
       </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title"><i class="ti ti-layout-grid" aria-hidden="true"></i> Permanent program modules</div>
+    <div class="module-grid">
+      <div class="module-card"><div><div class="module-top"><i class="ti ti-users" aria-hidden="true"></i> Personnel</div><div class="module-sub">Pilots, observers, supervisors, training, certification, and currency records.</div></div><div class="module-status ready">Ready</div></div>
+      <div class="module-card"><div><div class="module-top"><i class="ti ti-plane-tilt" aria-hidden="true"></i> Fleet</div><div class="module-sub">Aircraft, payloads, docks, maintenance, registrations, and assurance evidence.</div></div><div class="module-status planned">Pending data</div></div>
+      <div class="module-card"><div><div class="module-top"><i class="ti ti-folders" aria-hidden="true"></i> Documents</div><div class="module-sub">SOPs, CONOPS, policies, checklists, approvals, and controlled templates.</div></div><div class="module-status ready">Ready</div></div>
+      <div class="module-card"><div><div class="module-top"><i class="ti ti-chart-bar" aria-hidden="true"></i> SORA</div><div class="module-sub">Ground risk, air risk, mitigations, narrative, and evidence planning.</div></div><div class="module-status live">Connected</div></div>
+      <div class="module-card"><div><div class="module-top"><i class="ti ti-file-certificate" aria-hidden="true"></i> SFOC</div><div class="module-sub">Draft application package generation, review output, and print/PDF export.</div></div><div class="module-status live">Connected</div></div>
     </div>
   </div>
 
@@ -276,7 +305,7 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
 
   <div class="stage-layout">
     <div class="panel">
-      <div class="panel-title"><i class="ti ti-route" aria-hidden="true"></i> RPAS program stages</div>
+      <div class="panel-title"><i class="ti ti-route" aria-hidden="true"></i> Program maturity roadmap</div>
       <div class="stage-list" id="stage-list"></div>
     </div>
     <div class="panel">
@@ -295,7 +324,7 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
     <div class="tool-sub">Creates a draft TC form 26-0835E-style planning package for review · DroneSense Airbase</div>
   </div>
   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-    <button class="btn-action" onclick="showProgramBuilder()"><i class="ti ti-layout-dashboard" style="font-size:12px" aria-hidden="true"></i> Program Builder</button>
+    <button class="btn-action" onclick="showProgramBuilder()"><i class="ti ti-layout-dashboard" style="font-size:12px" aria-hidden="true"></i> Program Platform</button>
     <span class="tc-badge"><i class="ti ti-flag" style="font-size:12px;vertical-align:-1px" aria-hidden="true"></i> Canada / Transport Canada</span>
   </div>
 </div>
@@ -581,9 +610,38 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
 </div>
 
 <script>
+const PROGRAM_MODES={
+  new:{
+    score:'34%',
+    stage:'Governance & Approval',
+    status:'In setup',
+    statusColor:'#fef3c7',
+    sfoc:'Planned',
+    sfocColor:'#93c5fd',
+    actions:[
+      ['Confirm executive sponsor and governance path','Prepare command briefing, approval memo, and privacy / legal review route.'],
+      ['Define first operational use cases','Prioritize search, collision reconstruction, tactical perimeter, and missing-person response.'],
+      ['Start the documentation library','Build SOP, CONOPS, training, maintenance, incident, and evidence-handling templates.']
+    ]
+  },
+  mature:{
+    score:'78%',
+    stage:'Operational sustainment',
+    status:'Active program',
+    statusColor:'#34d399',
+    sfoc:'Renewal ready',
+    sfocColor:'#34d399',
+    actions:[
+      ['Import existing program records','Load current personnel, fleet, documents, SORA material, and SFOC history for review.'],
+      ['Check currency and document control','Review expiring pilot qualifications, aircraft records, SOP versions, and approval dates.'],
+      ['Prepare renewal or amendment package','Use the SFOC Generator when operational areas, aircraft, or mitigations change.']
+    ]
+  }
+};
+
 const PROGRAM_STAGES=[
-  {name:'Governance & Approval',status:'Complete',owner:'Chief / Deputy Chief',objective:'Establish authority, accountability, budget path, policy constraints, and command-level approval for the MHPS RPAS program.',tasks:['Confirm executive sponsor and program lead','Prepare command briefing and approval memo','Define governance board, privacy review, legal review, and records oversight'],docs:['Executive approval memo','Program charter','Privacy and legal review checklist'],next:'Record approval decision and assign the program lead.'},
-  {name:'Use Case Definition',status:'Drafting',owner:'Operations Inspector',objective:'Define priority police use cases and the operational value each RPAS workflow is expected to support.',tasks:['Prioritize first 3-5 missions','Define success measures and dispatch triggers','Identify prohibited or restricted use cases'],docs:['Use case register','Mission trigger matrix','Community impact notes'],next:'Approve initial use-case list for patrol, SAR, collision, and tactical support.'},
+  {name:'Governance & Approval',status:'Complete',owner:'Chief / Deputy Chief',objective:'Establish authority, accountability, budget path, policy constraints, and command-level approval for a new or existing MHPS RPAS program.',tasks:['Confirm executive sponsor and program lead','Prepare or import command approval record','Define governance board, privacy review, legal review, and records oversight'],docs:['Executive approval memo','Program charter','Privacy and legal review checklist'],next:'Record approval decision and assign the program lead.'},
+  {name:'Use Case Definition',status:'Drafting',owner:'Operations Inspector',objective:'Define or refresh priority police use cases and the operational value each RPAS workflow is expected to support.',tasks:['Prioritize first 3-5 missions','Define success measures and dispatch triggers','Identify prohibited or restricted use cases'],docs:['Use case register','Mission trigger matrix','Community impact notes'],next:'Approve initial use-case list for patrol, SAR, collision, and tactical support.'},
   {name:'Hardware Operating Model',status:'Decision needed',owner:'Procurement / Program Lead',objective:'Choose the aircraft, dock, sensor, support, maintenance, and data-handling approach MHPS intends to use.',tasks:['Compare agency-owned, vendor-supported, and hybrid hardware options','Define data custody and operational control','Confirm support and service-level expectations'],docs:['Hardware decision brief','Procurement requirements','Data custody matrix'],next:'Select preferred hardware approach and procurement route.'},
   {name:'Aircraft & Sensor Selection',status:'Not ready',owner:'RPAS Program Lead',objective:'Match aircraft, dock, payload, and sensor capabilities to public safety use cases and Canadian compliance needs.',tasks:['Define aircraft requirements','Assess sensor, thermal, zoom, night, and weather capabilities','Map safety assurance declarations and limitations'],docs:['Aircraft requirements matrix','Payload selection note','Safety assurance evidence file'],next:'Confirm hardware approach before shortlisting aircraft and sensor configurations.'},
   {name:'Personnel & Training',status:'Not ready',owner:'Training Sergeant',objective:'Identify pilots, supervisors, observers, maintainers, and evidence users; assign training and currency requirements.',tasks:['Nominate pilot cohort and supervisors','Define certification pathway and recurrent training','Create currency and competency tracking process'],docs:['Training plan','Pilot roster','Currency log template'],next:'Nominate first pilot cohort after priority use cases are approved.'},
@@ -599,6 +657,30 @@ const PROGRAM_STAGES=[
 function stagePill(status){
   const cls=status==='Complete'?'pill-complete':(status==='Drafting'||status==='Pending')?'pill-drafting':status==='Decision needed'?'pill-decision':'pill-locked';
   return `<span class="stage-pill ${cls}">${status}</span>`;
+}
+
+function renderNextActions(actions){
+  const list=document.getElementById('next-actions');
+  if(!list)return;
+  list.innerHTML=actions.map((a,i)=>`<div class="action-item"><div class="action-num">${i+1}</div><div><div class="action-title">${a[0]}</div><div class="action-sub">${a[1]}</div></div></div>`).join('');
+}
+
+function setProgramMode(mode){
+  const data=PROGRAM_MODES[mode]||PROGRAM_MODES.new;
+  const ring=document.querySelector('.score-ring');
+  const score=document.querySelector('.score-num');
+  const stage=document.getElementById('metric-stage');
+  const status=document.getElementById('metric-status');
+  const sfoc=document.getElementById('metric-sfoc');
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  const active=document.getElementById('mode-'+mode);
+  if(active)active.classList.add('active');
+  if(ring)ring.style.setProperty('--score',data.score);
+  if(score)score.textContent=data.score;
+  if(stage)stage.textContent=data.stage;
+  if(status){status.textContent=data.status;status.style.color=data.statusColor;}
+  if(sfoc){sfoc.textContent=data.sfoc;sfoc.style.color=data.sfocColor;}
+  renderNextActions(data.actions);
 }
 
 function renderStages(){
@@ -635,6 +717,15 @@ function selectProgramStage(index){
 function builderAction(action, stageName){
   const notice=document.getElementById('builder-notice');
   if(notice)notice.textContent=`${action} selected for ${stageName}. This prototype records the workflow intent; document generation and upload storage would connect to AirBase services in a production build.`;
+}
+
+function handleProgramImport(input){
+  const file=input.files&&input.files[0];
+  const notice=document.getElementById('builder-notice');
+  if(notice){
+    notice.textContent=file?`Imported ${file.name} for prototype review. In production, AirBase would map imported personnel, fleet, document, SORA, and SFOC records into the permanent modules.`:'';
+  }
+  setProgramMode('mature');
 }
 
 function openSFOCGenerator(){
@@ -987,6 +1078,7 @@ function generateForm(){
 
 renderStages();
 selectProgramStage(0);
+setProgramMode('new');
 loadScenario('ukr',document.querySelector('.sc-btn'));
 calcRisk();
 
